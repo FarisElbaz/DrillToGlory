@@ -1,0 +1,31 @@
+{
+  "project_info": {
+    "project_number": "813547937876",
+    "project_id": "gameproject-fb96e",
+    "storage_bucket": "gameproject-fb96e.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:813547937876:ios:97588761ee3da549084dc1",
+        "android_client_info": {
+          "package_name": "com.DefaultCompany.GameProject"
+        }
+      },
+      "api_key": [
+        {
+          "current_key": "AIzaSyA0Zbhw5VtdMMFHV_iufsnO5TymjpzBHP4"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 0
+        },
+        "appinvite_service": {
+          "status": 1
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
