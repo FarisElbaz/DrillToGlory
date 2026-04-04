@@ -1,0 +1,24 @@
+# Unity generated folders
+Library/
+Temp/
+Obj/
+Logs/
+UserSettings/
+MemoryCaptures/
+Build/
+Binaries/
+
+# IDE and OS files
+.vs/
+.vscode/
+.idea/
+.DS_Store
+
+# Build outputs
+*.apk
+*.aab
+*.unitypackage
+*.stackdump
+
+# Crash reports
+sysinfo.txt
