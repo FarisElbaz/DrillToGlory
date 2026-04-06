@@ -57,12 +57,10 @@
     <Compile Include="Assets/TextMesh Pro/Examples &amp; Extras/Scripts/TMP_TextSelector_A.cs" />
     <Compile Include="Assets/DOTween/Modules/DOTweenModuleUnityVersion.cs" />
     <Compile Include="Assets/Firebase/FirebaseAI/Chat.cs" />
-    <Compile Include="Assets/_Scripts/Visuals/Player.cs" />
     <Compile Include="Assets/TextMesh Pro/Examples &amp; Extras/Scripts/Benchmark02.cs" />
     <Compile Include="Assets/_Scripts/Visuals/AuthenticationScript.cs" />
     <Compile Include="Assets/DOTween/Modules/DOTweenModulePhysics2D.cs" />
     <Compile Include="Assets/DOTween/Modules/DOTweenModuleUI.cs" />
-    <Compile Include="Assets/_Scripts/Visuals/Enemy.cs" />
     <Compile Include="Assets/_Scripts/Visuals/UiManager.cs" />
     <Compile Include="Assets/TextMesh Pro/Examples &amp; Extras/Scripts/TMP_ExampleScript_01.cs" />
     <Compile Include="Assets/TextMesh Pro/Examples &amp; Extras/Scripts/TMPro_InstructionOverlay.cs" />
@@ -70,10 +68,10 @@
     <Compile Include="Assets/Firebase/FirebaseAI/CountTokensResponse.cs" />
     <Compile Include="Assets/Firebase/FirebaseApp/Internal/HttpHelpers.cs" />
     <Compile Include="Assets/Firebase/FirebaseAI/ModalityTokenCount.cs" />
-    <Compile Include="Assets/_Scripts/Visuals/Handview.cs" />
     <Compile Include="Assets/TextMesh Pro/Examples &amp; Extras/Scripts/VertexJitter.cs" />
     <Compile Include="Assets/Firebase/FirebaseAI/GenerateContentResponse.cs" />
     <Compile Include="Assets/TextMesh Pro/Examples &amp; Extras/Scripts/TMP_UiFrameRateCounter.cs" />
+    <Compile Include="Assets/_Scripts/GameplayMechanics/Handview.cs" />
     <Compile Include="Assets/TextMesh Pro/Examples &amp; Extras/Scripts/VertexZoom.cs" />
     <Compile Include="Assets/_Scripts/Visuals/CardData.cs" />
     <Compile Include="Assets/TextMesh Pro/Examples &amp; Extras/Scripts/TMP_TextSelector_B.cs" />
@@ -88,6 +86,7 @@
     <Compile Include="Assets/TextMesh Pro/Examples &amp; Extras/Scripts/VertexShakeA.cs" />
     <Compile Include="Assets/TextMesh Pro/Examples &amp; Extras/Scripts/Benchmark01_UGUI.cs" />
     <Compile Include="Assets/TextMesh Pro/Examples &amp; Extras/Scripts/SimpleScript.cs" />
+    <Compile Include="Assets/_Scripts/GameplayMechanics/Enemy.cs" />
     <Compile Include="Assets/TextMesh Pro/Examples &amp; Extras/Scripts/Benchmark04.cs" />
     <Compile Include="Assets/TextMesh Pro/Examples &amp; Extras/Scripts/ChatController.cs" />
     <Compile Include="Assets/Firebase/FirebaseAI/Citation.cs" />
@@ -96,6 +95,7 @@
     <Compile Include="Assets/TextMesh Pro/Examples &amp; Extras/Scripts/Benchmark01.cs" />
     <Compile Include="Assets/TextMesh Pro/Examples &amp; Extras/Scripts/TextMeshSpawner.cs" />
     <Compile Include="Assets/Firebase/FirebaseAI/Safety.cs" />
+    <Compile Include="Assets/_Scripts/GameplayMechanics/Player.cs" />
     <Compile Include="Assets/TextMesh Pro/Examples &amp; Extras/Scripts/CameraController.cs" />
     <Compile Include="Assets/TextMesh Pro/Examples &amp; Extras/Scripts/Benchmark03.cs" />
     <Compile Include="Assets/Firebase/FirebaseAI/FirebaseAI.cs" />
@@ -113,7 +113,6 @@
     <Compile Include="Assets/TextMesh Pro/Examples &amp; Extras/Scripts/ObjectSpin.cs" />
     <Compile Include="Assets/DOTween/Modules/DOTweenModulePhysics.cs" />
     <Compile Include="Assets/TextMesh Pro/Examples &amp; Extras/Scripts/TMP_PhoneNumberValidator.cs" />
-    <Compile Include="Assets/_Scripts/Visuals/CardViews.cs" />
     <Compile Include="Assets/TextMesh Pro/Examples &amp; Extras/Scripts/TextConsoleSimulator.cs" />
     <Compile Include="Assets/Firebase/FirebaseAI/Schema.cs" />
     <Compile Include="Assets/TextMesh Pro/Examples &amp; Extras/Scripts/TeleType.cs" />
@@ -124,6 +123,7 @@
     <Compile Include="Assets/TextMesh Pro/Examples &amp; Extras/Scripts/TextMeshProFloatingText.cs" />
     <Compile Include="Assets/Firebase/FirebaseAI/ResponseModality.cs" />
     <Compile Include="Assets/Firebase/FirebaseAI/Imagen/ImagenSafety.cs" />
+    <Compile Include="Assets/_Scripts/GameplayMechanics/CardViews.cs" />
     <Compile Include="Assets/Firebase/FirebaseAI/GenerationConfig.cs" />
     <Compile Include="Assets/DOTween/Modules/DOTweenModuleUIToolkit.cs" />
     <Compile Include="Assets/DOTween/Modules/DOTweenModuleUtils.cs" />

@@ -1,7 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using DG.Tweening;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public enum Dimension { Reality, Void };
 
@@ -538,6 +540,14 @@ public class HandView : MonoBehaviour
         if (uiManager != null)
         {
             uiManager.DimensionSwitchVisuals(currentDimension);
+        }
+    }
+
+    public void ReturnToStart()
+    {
+        if(currentState == GameState.Defeat)
+        {
+            SceneManager.LoadScene(1);
         }
     }
 }

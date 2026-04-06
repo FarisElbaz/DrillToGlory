@@ -9,10 +9,7 @@ Build/
 Binaries/
 
 # Large third-party Unity assets/plugins
-Assets/Firebase/
-Assets/Firebase.meta
-Assets/DOTween/
-Assets/DOTween.meta
+
 
 # IDE and OS files
 .vs/
