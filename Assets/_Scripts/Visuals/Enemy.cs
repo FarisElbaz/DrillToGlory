@@ -8,6 +8,7 @@ public class Enemy : MonoBehaviour
     [SerializeField] private int health = 20;
 
     [SerializeField] private HandView hand;
+    [SerializeField] private UiManager uiManager;
 
     public int CurrentHealth { get; private set; }
 
@@ -31,7 +32,11 @@ public class Enemy : MonoBehaviour
     {
         CurrentHealth = 20 + (roomCounter * 5);
 
-        if (healthDisplay != null)
+        if (uiManager != null)
+        {
+            uiManager.UpdateEnemyHealthDisplay(healthDisplay, CurrentHealth);
+        }
+        else if (healthDisplay != null)
         {
             healthDisplay.text = $"Enemy Health: {CurrentHealth}";
         }
@@ -41,7 +46,11 @@ public class Enemy : MonoBehaviour
     {
         CurrentHealth -= damage;
 
-        if (healthDisplay != null)
+        if (uiManager != null)
+        {
+            uiManager.UpdateEnemyHealthDisplay(healthDisplay, CurrentHealth);
+        }
+        else if (healthDisplay != null)
         {
             healthDisplay.text = $"Enemy Health: {CurrentHealth}";
         }
@@ -110,7 +119,11 @@ public class Enemy : MonoBehaviour
     {
         CurrentHealth = health;
 
-        if (healthDisplay != null)
+        if (uiManager != null)
+        {
+            uiManager.UpdateEnemyHealthDisplay(healthDisplay, CurrentHealth);
+        }
+        else if (healthDisplay != null)
         {
             healthDisplay.text = $"Enemy Health: {CurrentHealth}";
         }

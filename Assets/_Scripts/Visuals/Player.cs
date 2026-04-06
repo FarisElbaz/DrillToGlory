@@ -8,7 +8,7 @@ public class Player : MonoBehaviour
     public int CurrentPlayerHealth { get; private set; }
 
     [SerializeField] private HandView handView;
-
+    [SerializeField] private UiManager uiManager;
 
     [SerializeField] private TextMeshProUGUI healthDisplay;
 
@@ -46,13 +46,16 @@ public class Player : MonoBehaviour
 
     public void UpdateHealthDisplay()
     {
-        if (healthDisplay == null)
+        if (uiManager == null)
         {
-            Debug.LogWarning("Player healthDisplay is not assigned.");
+            if (healthDisplay != null)
+            {
+                healthDisplay.text = $"Player Health: {CurrentPlayerHealth}";
+            }
             return;
         }
 
-        healthDisplay.text = $"Player Health: {CurrentPlayerHealth}";
+        uiManager.UpdatePlayerHealthDisplay(healthDisplay, CurrentPlayerHealth);
     }
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created

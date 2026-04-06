@@ -2,9 +2,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using DG.Tweening;
-using TMPro;
-using UnityEngine.UI;
 
 public enum Dimension { Reality, Void };
 
@@ -12,10 +9,6 @@ public class HandView : MonoBehaviour
 {
     public enum DamageTarget { Player, Enemy }
     public Dimension currentDimension = Dimension.Reality;
-
-    public Color realityColor = Color.white;
-    public Color voidColor = new Color(0.5f, 0, 0.5f); // Purple-ish
-    public Image backgroundUI;
 
     [SerializeField] private List<CardViews> cardsInHand = new List<CardViews>();
 
@@ -45,6 +38,8 @@ public class HandView : MonoBehaviour
 
     [SerializeField] private int roomCounter = 0;
 
+    [SerializeField] private UiManager uiManager;
+
     [Header("Hand Arch Tuning")]
     [SerializeField] private float maxWidth = 400f;
     [SerializeField] private float curveHeight = 50f;
@@ -54,12 +49,6 @@ public class HandView : MonoBehaviour
     [SerializeField] private int maxMana = 5;
 
     [SerializeField] private int currentMana = 0;
-
-    [SerializeField] private TextMeshProUGUI manaText;
-
-    [Header("End Screens")]
-    [SerializeField] private GameObject victoryScreen;
-    [SerializeField] private GameObject defeatScreen;
 
     [Header("Dimension Damage Modifiers")]
     [SerializeField] private float realityDamageToPlayerMultiplier = 1f;
@@ -76,29 +65,9 @@ public class HandView : MonoBehaviour
     public void SetGameState(GameState newState)
     {
         currentState = newState;
-        UpdateEndScreensForState();
-    }
-
-    private void UpdateEndScreensForState()
-    {
-        if (victoryScreen == null && currentState == GameState.Victory)
+        if (uiManager != null)
         {
-            Debug.LogWarning("Victory state reached, but victoryScreen is not assigned on HandView.");
-        }
-
-        if (defeatScreen == null && currentState == GameState.Defeat)
-        {
-            Debug.LogWarning("Defeat state reached, but defeatScreen is not assigned on HandView.");
-        }
-
-        if (victoryScreen != null)
-        {
-            victoryScreen.SetActive(currentState == GameState.Victory);
-        }
-
-        if (defeatScreen != null)
-        {
-            defeatScreen.SetActive(currentState == GameState.Defeat);
+            uiManager.SetGameState(currentState);
         }
     }
 
@@ -149,18 +118,6 @@ public class HandView : MonoBehaviour
 
     void Start()
     {
-        DOTween.Init();
-
-        if (victoryScreen != null)
-        {
-            victoryScreen.SetActive(false);
-        }
-
-        if (defeatScreen != null)
-        {
-            defeatScreen.SetActive(false);
-        }
-
         enemies.RemoveAll(enemy => enemy == null);
         if (enemies.Count == 0)
         {
@@ -208,7 +165,10 @@ public class HandView : MonoBehaviour
         DrawUpToHandSize();
 
         UpdateHandVisuals();
-        UpdateManaDisplay();
+        if (uiManager != null)
+        {
+            uiManager.InitializeUi(currentState, currentMana, maxMana);
+        }
     }
 
     public void UpdateHandVisuals()
@@ -291,16 +251,10 @@ public class HandView : MonoBehaviour
         Debug.Log("Played card: " + playedCard.name);
         Destroy(playedCard.gameObject); 
 
-        UpdateManaDisplay();
-    }
-
-    public void DimensionSwitchVisuals()
-    {
-        // TODO: Add some cool visual effects here when switching dimensions, like a screen shake or a flash of color
-        currentDimension = currentDimension == Dimension.Reality ? Dimension.Void : Dimension.Reality;
-        backgroundUI.color = currentDimension == Dimension.Reality ? realityColor : voidColor;
-        Camera.main.DOShakeRotation(0.5f, 10f);
-        Camera.main.DOShakePosition(0.5f, 10f);
+        if (uiManager != null)
+        {
+            uiManager.UpdateManaDisplay(currentMana, maxMana);
+        }
     }
 
     public int ApplyDimensionDamageModifier(int baseDamage, DamageTarget target)
@@ -322,16 +276,6 @@ public class HandView : MonoBehaviour
 
         int modifiedDamage = Mathf.Max(0, Mathf.RoundToInt(baseDamage * multiplier));
         return modifiedDamage;
-    }
-
-    public void UpdateManaDisplay()
-    {
-        if (manaText == null)
-        {
-            return;
-        }
-
-        manaText.text = $"Mana: {currentMana}/{maxMana}";
     }
 
     public void onDrawCardButton()
@@ -378,7 +322,10 @@ public class HandView : MonoBehaviour
         newCard.injection(drawnData, dropZone, this);
         cardsInHand.Add(newCard);
         UpdateHandVisuals();
-        UpdateManaDisplay();
+        if (uiManager != null)
+        {
+            uiManager.UpdateManaDisplay(currentMana, maxMana);
+        }
 
         return true;
     }
@@ -505,7 +452,6 @@ public class HandView : MonoBehaviour
         {
             Debug.Log("All enemies defeated, transitioning to Victory state");
             SetGameState(GameState.Victory);
-            UpdateEndScreensForState();
         }
     }
 
@@ -534,7 +480,10 @@ public class HandView : MonoBehaviour
         currentMana = maxMana;
         DrawUpToHandSize();
         UpdateHandVisuals();
-        UpdateManaDisplay();
+        if (uiManager != null)
+        {
+            uiManager.UpdateManaDisplay(currentMana, maxMana);
+        }
     }
 
     IEnumerator EnemyTurnSequence()
@@ -569,7 +518,10 @@ public class HandView : MonoBehaviour
 
         SetGameState(GameState.PlayerTurn);
         currentMana = maxMana;
-        UpdateManaDisplay();
+        if (uiManager != null)
+        {
+            uiManager.UpdateManaDisplay(currentMana, maxMana);
+        }
         UpdateHandVisuals();
 
         int enemyCount = Mathf.Max(1, baseEnemiesPerRoom + roomCounter);
@@ -577,5 +529,15 @@ public class HandView : MonoBehaviour
 
         DrawUpToHandSize();
         UpdateHandVisuals();
+    }
+
+    public void DimensionSwitchVisuals()
+    {
+        currentDimension = currentDimension == Dimension.Reality ? Dimension.Void : Dimension.Reality;
+
+        if (uiManager != null)
+        {
+            uiManager.DimensionSwitchVisuals(currentDimension);
+        }
     }
 }

@@ -8,6 +8,7 @@ using UnityEngine.InputSystem.XR.Haptics;
 public class CardViews : MonoBehaviour, IPointerDownHandler, IDragHandler, IPointerUpHandler 
 {
     private HandView handView;
+    [SerializeField] private UiManager uiManager;
     private RectTransform cardRect;
     private RectTransform parentRect;
     private Canvas parentCanvas;
@@ -16,6 +17,7 @@ public class CardViews : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoin
     private Vector3 basePosition;
     private Quaternion baseRotation; 
     private int baseZIndex;
+    private bool isDragging;
 
     [SerializeField] private RectTransform dropZone;
 
@@ -69,20 +71,29 @@ public class CardViews : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoin
         SetHandView(handViewRef);
         Debug.Log("SUCCESS: Injecting data for: " + data.cardName);
 
-
-        cardName.text = cardData.cardName;
-        manaCost.text = cardData.manaCost.ToString();
-        damage.text = cardData.damage.ToString();
-        defense.text = cardData.defense.ToString();
-        description.text = cardData.description;
+        if (uiManager != null)
+        {
+            uiManager.UpdateCardDisplay(cardName, manaCost, damage, defense, description, cardData);
+        }
+        else
+        {
+            cardName.text = cardData.cardName;
+            manaCost.text = cardData.manaCost.ToString();
+            damage.text = cardData.damage.ToString();
+            defense.text = cardData.defense.ToString();
+            description.text = cardData.description;
+        }
     }
     public void SetBaseTargets(Vector3 targetPos, float targetRotZ, int zIndex) 
     {
         basePosition = targetPos;
         baseRotation = Quaternion.Euler(0f, 0f, targetRotZ); 
         baseZIndex = zIndex;
-        
-        SendToBase();
+
+        if (!isDragging)
+        {
+            SendToBase();
+        }
     }
 
     public void SendToBase() 
@@ -119,26 +130,19 @@ public class CardViews : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoin
                 dragOffset = Vector2.zero;
             }
         }
-        if (handView.CurrentState != HandView.GameState.PlayerTurn)
+        if (handView == null || handView.CurrentState != HandView.GameState.PlayerTurn)
         {
             return;
         }
-        else
-        {
-            dragOffset = Vector2.zero;
-        }
 
-        Vector3 popUpPos = basePosition + new Vector3(0, 100f, 0);
-        transform.DOLocalMove(popUpPos, 0.15f).SetEase(Ease.OutBack);
+        isDragging = true;
 
-        transform.DOScale(Vector3.one * 1.2f, 0.15f).SetEase(Ease.OutBack);
+        transform.DOScale(Vector3.one * 0.8f, 0.15f).SetEase(Ease.OutBack);
         transform.DOLocalRotateQuaternion(Quaternion.identity, 0.15f).SetEase(Ease.OutQuad);
     }
 
     public void OnDrag(PointerEventData eventData)
     {
-        transform.DOKill();
-
         if (handView.CurrentState != HandView.GameState.PlayerTurn)
         {
             return;
@@ -163,6 +167,8 @@ public class CardViews : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoin
 
     public void OnPointerUp(PointerEventData eventData) 
     {
+        isDragging = false;
+
         if (dropZone == null || handView == null)
         {
             SendToBase();
