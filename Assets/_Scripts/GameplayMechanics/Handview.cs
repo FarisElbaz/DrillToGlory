@@ -9,6 +9,8 @@ public enum Dimension { Reality, Void };
 
 public class HandView : MonoBehaviour
 {
+
+    Upgrades upgrades;
     public enum DamageTarget { Player, Enemy }
     public Dimension currentDimension = Dimension.Reality;
 
@@ -506,9 +508,36 @@ public class HandView : MonoBehaviour
         StartPlayerTurn();
     }
 
+    public void IncreaseMaxMana(int amount, bool refill= true)
+    {
+        maxMana += amount;
+        if(refill)
+        {
+            currentMana = maxMana;
+        }
+        if (uiManager != null)
+        {
+            uiManager.UpdateManaDisplay(currentMana, maxMana);
+        }
+    }
+
+
     public void NextRoom()
     {
         roomCounter += 1;
+        if(upgrades != null)
+        {
+            upgrades.ApplyroomRegen();
+            upgrades.UpgradePoints += 1;
+            if(upgrades.UpgradePoints > 0)
+            {
+                upgrades.OpenUpgrades();
+            }
+            else
+            {
+                Debug.Log("No upgrade points available");
+            }
+        }
 
         Debug.Log("Room Counter: " + roomCounter);
 

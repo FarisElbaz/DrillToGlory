@@ -44,6 +44,17 @@ public class Player : MonoBehaviour
         }
     }
 
+    public void regenerate(int amount)
+    {
+        if(amount <= 0){return;}
+        CurrentPlayerHealth += amount;
+        if(CurrentPlayerHealth > playerHealth)
+        {
+            CurrentPlayerHealth = playerHealth;
+        }
+        UpdateHealthDisplay();
+    }
+
     public void UpdateHealthDisplay()
     {
         if (uiManager == null)
