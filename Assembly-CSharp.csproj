@@ -53,6 +53,7 @@
     <Compile Include="Assets/TextMesh Pro/Examples &amp; Extras/Scripts/TMP_TextEventHandler.cs" />
     <Compile Include="Assets/_Scripts/Visuals/PlayerData.cs" />
     <Compile Include="Assets/TextMesh Pro/Examples &amp; Extras/Scripts/EnvMapAnimator.cs" />
+    <Compile Include="Assets/_Scripts/GameplayMechanics/Upgrades.cs" />
     <Compile Include="Assets/Firebase/FirebaseAI/LiveGenerationConfig.cs" />
     <Compile Include="Assets/TextMesh Pro/Examples &amp; Extras/Scripts/TMP_TextSelector_A.cs" />
     <Compile Include="Assets/DOTween/Modules/DOTweenModuleUnityVersion.cs" />

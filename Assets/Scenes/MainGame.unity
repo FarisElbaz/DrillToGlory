@@ -131,7 +131,7 @@ GameObject:
   - component: {fileID: 257560726}
   - component: {fileID: 257560725}
   m_Layer: 5
-  m_Name: Mana Cost
+  m_Name: Mana Display
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1579,7 +1579,7 @@ GameObject:
   - component: {fileID: 1076803221}
   - component: {fileID: 1076803223}
   m_Layer: 5
-  m_Name: Image
+  m_Name: Player
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1594,7 +1594,7 @@ RectTransform:
   m_GameObject: {fileID: 1076803219}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 2.5, y: 2.5, z: 2.5}
+  m_LocalScale: {x: 4, y: 4, z: 4}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1854866346}
@@ -2076,7 +2076,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1605223263
 RectTransform:
   m_ObjectHideFlags: 0
@@ -2388,8 +2388,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 2, y: 83.99997}
-  m_SizeDelta: {x: 100, y: 25}
+  m_AnchoredPosition: {x: -25.521719, y: 238.56706}
+  m_SizeDelta: {x: 128.9566, y: 24.0659}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1854866347
 MonoBehaviour:
