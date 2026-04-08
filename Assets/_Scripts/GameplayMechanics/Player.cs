@@ -4,6 +4,9 @@ using UnityEngine;
 public class Player : MonoBehaviour
 {
     [SerializeField] private int playerHealth = 30;
+    [SerializeField] private int defense = 0;
+    
+    public int Defense { get => defense; set => defense = value; }
 
     public int CurrentPlayerHealth { get; private set; }
 
@@ -53,6 +56,11 @@ public class Player : MonoBehaviour
             CurrentPlayerHealth = playerHealth;
         }
         UpdateHealthDisplay();
+    }
+
+    public void defend(int defenseAmount)
+    {
+        defense = defenseAmount;
     }
 
     public void UpdateHealthDisplay()

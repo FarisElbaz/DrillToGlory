@@ -104,13 +104,33 @@ PrefabInstance:
       propertyPath: m_Name
       value: MechaSpider(Health)
       objectReference: {fileID: 0}
+    - target: {fileID: 6542770989086875188, guid: 0efc44b1b1c9b4e91a5beaffadcaee29, type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 87.2605
+      objectReference: {fileID: 0}
+    - target: {fileID: 6542770989086875188, guid: 0efc44b1b1c9b4e91a5beaffadcaee29, type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 12.2265
+      objectReference: {fileID: 0}
+    - target: {fileID: 6542770989086875188, guid: 0efc44b1b1c9b4e91a5beaffadcaee29, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 26.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6542770989086875188, guid: 0efc44b1b1c9b4e91a5beaffadcaee29, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: -6.1133
+      objectReference: {fileID: 0}
     - target: {fileID: 9010525203831771589, guid: 0efc44b1b1c9b4e91a5beaffadcaee29, type: 3}
       propertyPath: m_fontSize
-      value: 1
+      value: 8
       objectReference: {fileID: 0}
     - target: {fileID: 9010525203831771589, guid: 0efc44b1b1c9b4e91a5beaffadcaee29, type: 3}
       propertyPath: m_fontSizeBase
-      value: 1
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 9010525203831771589, guid: 0efc44b1b1c9b4e91a5beaffadcaee29, type: 3}
+      propertyPath: m_HorizontalAlignment
+      value: 2
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

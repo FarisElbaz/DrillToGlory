@@ -22,7 +22,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2524841853489223183, guid: 0efc44b1b1c9b4e91a5beaffadcaee29, type: 3}
       propertyPath: m_AnchorMax.y
-      value: 0.5
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2524841853489223183, guid: 0efc44b1b1c9b4e91a5beaffadcaee29, type: 3}
       propertyPath: m_AnchorMin.x
@@ -30,7 +30,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2524841853489223183, guid: 0efc44b1b1c9b4e91a5beaffadcaee29, type: 3}
       propertyPath: m_AnchorMin.y
-      value: 0.5
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2524841853489223183, guid: 0efc44b1b1c9b4e91a5beaffadcaee29, type: 3}
       propertyPath: m_SizeDelta.x
@@ -82,7 +82,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2524841853489223183, guid: 0efc44b1b1c9b4e91a5beaffadcaee29, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 0
+      value: -585
       objectReference: {fileID: 0}
     - target: {fileID: 2524841853489223183, guid: 0efc44b1b1c9b4e91a5beaffadcaee29, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -112,13 +112,29 @@ PrefabInstance:
       propertyPath: m_Name
       value: MechaBox(Defense))
       objectReference: {fileID: 0}
+    - target: {fileID: 6542770989086875188, guid: 0efc44b1b1c9b4e91a5beaffadcaee29, type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 52.9891
+      objectReference: {fileID: 0}
+    - target: {fileID: 6542770989086875188, guid: 0efc44b1b1c9b4e91a5beaffadcaee29, type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 10.1014
+      objectReference: {fileID: 0}
+    - target: {fileID: 6542770989086875188, guid: 0efc44b1b1c9b4e91a5beaffadcaee29, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 28.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 6542770989086875188, guid: 0efc44b1b1c9b4e91a5beaffadcaee29, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 24.6
+      objectReference: {fileID: 0}
     - target: {fileID: 9010525203831771589, guid: 0efc44b1b1c9b4e91a5beaffadcaee29, type: 3}
       propertyPath: m_fontSize
-      value: 1
+      value: 8
       objectReference: {fileID: 0}
     - target: {fileID: 9010525203831771589, guid: 0efc44b1b1c9b4e91a5beaffadcaee29, type: 3}
       propertyPath: m_fontSizeBase
-      value: 1
+      value: 8
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

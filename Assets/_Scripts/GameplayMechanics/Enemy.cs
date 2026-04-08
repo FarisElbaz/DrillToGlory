@@ -109,6 +109,13 @@ public class Enemy : MonoBehaviour
             return;
         }
 
+        if(player.Defense > 0)
+        {
+            int reducedDamage = Mathf.Max(0, 5 - player.Defense);
+            player.DamageTaken(reducedDamage);
+            return;
+        }
+
         int modifiedDamage = hand.ApplyDimensionDamageModifier(5, HandView.DamageTarget.Player);
         Debug.Log("Dealing " + modifiedDamage + " damage to player");
         player.DamageTaken(modifiedDamage);

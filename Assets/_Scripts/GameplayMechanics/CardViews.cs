@@ -175,31 +175,43 @@ public class CardViews : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoin
             return;
         }
 
-        Enemy target = handView.Enemies.FirstOrDefault(e =>
+        if(cardData.cardType == CardData.CardType.Attack)
         {
-            if (e == null || !e.gameObject.activeInHierarchy)
-            {
-                return false;
-            }
+            Enemy target = handView.Enemies.FirstOrDefault(e =>
+                {
+                    if (e == null || !e.gameObject.activeInHierarchy)
+                    {
+                        return false;
+                    }
 
-            RectTransform enemyRect = e.transform as RectTransform;
-            if (enemyRect == null)
-            {
-                return false;
-            }
+                    RectTransform enemyRect = e.transform as RectTransform;
+                    if (enemyRect == null)
+                    {
+                        return false;
+                    }
 
-            Camera eventCamera = eventData.pressEventCamera;
-            if (eventCamera == null && parentCanvas != null && parentCanvas.renderMode != RenderMode.ScreenSpaceOverlay)
-            {
-                eventCamera = parentCanvas.worldCamera;
-            }
+                    Camera eventCamera = eventData.pressEventCamera;
+                    if (eventCamera == null && parentCanvas != null && parentCanvas.renderMode != RenderMode.ScreenSpaceOverlay)
+                    {
+                        eventCamera = parentCanvas.worldCamera;
+                    }
 
-            return RectTransformUtility.RectangleContainsScreenPoint(enemyRect, eventData.position, eventCamera);
-        });
-
-        if (target != null)
+                    return RectTransformUtility.RectangleContainsScreenPoint(enemyRect, eventData.position, eventCamera);
+                });
+                if (target != null)
+                {
+                    handView.OnCardPlayed(this, target);
+                    return;
+                }
+        }
+        else if (cardData.cardType == CardData.CardType.Defense)
         {
-            handView.OnCardPlayed(this, target);
+            handView.OnCardPlayed(this, null);
+            return;
+        }
+        else if (cardData.cardType == CardData.CardType.Heal)
+        {
+            handView.OnCardPlayed(this, null);
             return;
         }
 

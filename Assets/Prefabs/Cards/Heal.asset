@@ -10,11 +10,13 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 4a246e2000f58459c91b22476fe884eb, type: 3}
-  m_Name: Strike (1)
+  m_Name: Heal
   m_EditorClassIdentifier: Assembly-CSharp::CardData
-  cardName: Fireball
-  manaCost: 2
-  damage: 8
+  cardName: 
+  manaCost: 0
+  damage: 0
   defense: 0
-  cardArt: {fileID: 5826479529469629657, guid: 8f14f455503da48c2b786453a3f64976, type: 3}
+  heal: 0
+  cardType: 0
+  cardArt: {fileID: 0}
   description: 

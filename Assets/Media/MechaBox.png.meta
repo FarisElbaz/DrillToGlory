@@ -52,7 +52,7 @@ TextureImporter:
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
   spritePixelsToUnits: 100
-  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteBorder: {x: 541, y: 376, z: 0, w: 340}
   spriteGenerateFallbackPhysicsShape: 1
   alphaUsage: 1
   alphaIsTransparency: 1
@@ -165,15 +165,15 @@ TextureImporter:
       - key: SpriteEditor.SliceSettings
         value: '{"sliceOnImport":true,"gridCellCount":{"x":1.0,"y":1.0},"gridSpriteSize":{"x":64.0,"y":64.0},"gridSpriteOffset":{"x":0.0,"y":0.0},"gridSpritePadding":{"x":0.0,"y":0.0},"pivot":{"x":0.5,"y":0.5},"pivotPixels":{"x":0.0,"y":0.0},"autoSlicingMethod":0,"spriteAlignment":0,"pivotUnitMode":0,"slicingType":0,"keepEmptyRects":false,"isAlternate":false}'
     nameFileIdTable:
-      MechaBox_0: -585579734
-      MechaBox_1: -395905944
-      MechaBox_2: -934082496
-      MechaBox_3: 1779366628
-      MechaBox_4: -2106020325
-      MechaBox_5: 689540467
-      MechaBox_6: -518158386
-      MechaBox_7: 2038893808
-      MechaBox_8: 701086827
+      MechaBox_0: 94970998
+      MechaBox_1: 262993333
+      MechaBox_2: -1276636771
+      MechaBox_3: -573567487
+      MechaBox_4: -1109064916
+      MechaBox_5: -1049066362
+      MechaBox_6: -1665367032
+      MechaBox_7: -1633098562
+      MechaBox_8: -744633593
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
