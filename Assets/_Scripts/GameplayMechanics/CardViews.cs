@@ -4,6 +4,8 @@ using DG.Tweening;
 using TMPro;
 using System.Linq;
 using UnityEngine.InputSystem.XR.Haptics;
+using System;
+using UnityEngine.UI;
 
 public class CardViews : MonoBehaviour, IPointerDownHandler, IDragHandler, IPointerUpHandler 
 {
@@ -27,6 +29,7 @@ public class CardViews : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoin
     [SerializeField] private TextMeshProUGUI damage;
     [SerializeField] private TextMeshProUGUI defense;
     [SerializeField] private TextMeshProUGUI description;
+    [SerializeField] private Image cardArt;
 
     public CardData cardData { get; private set; }
 
@@ -73,7 +76,7 @@ public class CardViews : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoin
 
         if (uiManager != null)
         {
-            uiManager.UpdateCardDisplay(cardName, manaCost, damage, defense, description, cardData);
+            uiManager.UpdateCardDisplay(cardName, manaCost, damage, defense, description, cardArt, cardData);
         }
         else
         {
@@ -82,6 +85,7 @@ public class CardViews : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoin
             damage.text = cardData.damage.ToString();
             defense.text = cardData.defense.ToString();
             description.text = cardData.description;
+            cardArt.sprite = cardData.cardArt;
         }
     }
     public void SetBaseTargets(Vector3 targetPos, float targetRotZ, int zIndex) 
