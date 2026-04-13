@@ -1,3 +1,4 @@
+using TMPro;
 using UnityEngine;
 using UnityEngine.XR;
 
@@ -6,7 +7,9 @@ public class Upgrades : MonoBehaviour
     [SerializeField] private GameObject upgradePanel;
     [SerializeField] private GameObject distortionEffect;
 
-    HandView handView;
+    [SerializeField] private HandView handView;
+
+    [SerializeField] private UpgradesUI upgradesUI;
 
     private int upgradePoints = 0;
 
@@ -21,27 +24,23 @@ public class Upgrades : MonoBehaviour
     public int BaseUtility { get => baseUtility; set => baseUtility = value; }
     public float BaseDefense { get => baseDefense; set => baseDefense = value; }
 
-    Player player;
+    [SerializeField] private Player player;
 
 
-    public void OpenUpgrades()
+    public void ToggleUpgrades()
     {
         if (upgradePanel.activeSelf)
         {
-            return;
+            upgradePanel.SetActive(false);
+            distortionEffect.SetActive(false);
         }
-        upgradePanel.SetActive(true);
-        distortionEffect.SetActive(true);
-    }
-
-    public void CloseUpgrades()
-    {
-        if (!upgradePanel.activeSelf)
+        else if(upgradePanel.activeSelf == false)
         {
-            return;
+            upgradePanel.SetActive(true);
+            distortionEffect.SetActive(true);
         }
-        distortionEffect.SetActive(false);
-        upgradePanel.SetActive(false);
+        upgradesUI.updateUpgradesUI();
+        return;
     }
 
     public void UpgradeRegen()
@@ -67,6 +66,7 @@ public class Upgrades : MonoBehaviour
         {
             baseregen += 1;
         }
+        upgradesUI.updateUpgradesUI();
     }
 
     public void ApplyroomRegen()
@@ -93,11 +93,12 @@ public class Upgrades : MonoBehaviour
         }
         upgradePoints -= 1;
         baseDamage += 0.5f;
+        upgradesUI.updateUpgradesUI();
     }
 
     public void UpgradeUtility()
     { // Basically max mana
-        if(baseUtility >= 10)
+        if(baseUtility >= 3)
         {
             return;
         }
@@ -109,8 +110,9 @@ public class Upgrades : MonoBehaviour
         baseUtility += 1;
         if(handView != null)
         {
-            handView.IncreaseMaxMana(baseUtility);
+            handView.IncreaseMaxMana();
         }
+        upgradesUI.updateUpgradesUI();
     }
 
     public void UpgradeDefense() // still unsure how i want defense to impact gameplay
@@ -125,6 +127,7 @@ public class Upgrades : MonoBehaviour
         }
         upgradePoints -= 1;
         baseDefense += 0.5f;
+        upgradesUI.updateUpgradesUI();
     }
 
 

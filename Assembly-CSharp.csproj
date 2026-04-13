@@ -71,6 +71,7 @@
     <Compile Include="Assets/Firebase/FirebaseAI/ModalityTokenCount.cs" />
     <Compile Include="Assets/TextMesh Pro/Examples &amp; Extras/Scripts/VertexJitter.cs" />
     <Compile Include="Assets/Firebase/FirebaseAI/GenerateContentResponse.cs" />
+    <Compile Include="Assets/_Scripts/Visuals/UpgradesUI.cs" />
     <Compile Include="Assets/TextMesh Pro/Examples &amp; Extras/Scripts/TMP_UiFrameRateCounter.cs" />
     <Compile Include="Assets/_Scripts/GameplayMechanics/Handview.cs" />
     <Compile Include="Assets/TextMesh Pro/Examples &amp; Extras/Scripts/VertexZoom.cs" />
@@ -177,6 +178,7 @@
     <None Include="Assets/TextMesh Pro/Shaders/TMP_Bitmap-Mobile.shader" />
     <None Include="Assets/Firebase/Plugins/Google.MiniJson.dll" />
     <None Include="Assets/TextMesh Pro/Fonts/LiberationSans - OFL.txt" />
+    <None Include="Assets/_Fonts/Silkscreen/OFL.txt" />
     <None Include="Assets/TextMesh Pro/Shaders/TMP_SDF-Mobile.shader" />
     <None Include="Assets/Firebase/Plugins/iOS/Firebase.App.dll" />
     <None Include="Assets/TextMesh Pro/Shaders/TMP_Sprite.shader" />

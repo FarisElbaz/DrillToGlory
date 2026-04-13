@@ -71,8 +71,7 @@ public class Enemy : MonoBehaviour
             case EnemyType.Aggro:
                 if (player != null && hand != null)
                 {
-                    int damage = hand.ApplyDimensionDamageModifier(10, HandView.DamageTarget.Player);
-                    player.DamageTaken(damage);
+                    player.DamageTaken(10);
                 }
                 break;
             case EnemyType.Tank:
@@ -109,15 +108,7 @@ public class Enemy : MonoBehaviour
             return;
         }
 
-        if(player.Defense > 0)
-        {
-            int reducedDamage = Mathf.Max(0, 5 - player.Defense);
-            player.DamageTaken(reducedDamage);
-            return;
-        }
-
-        int modifiedDamage = hand.ApplyDimensionDamageModifier(5, HandView.DamageTarget.Player);
-        Debug.Log("Dealing " + modifiedDamage + " damage to player");
+        var modifiedDamage = 10;
         player.DamageTaken(modifiedDamage);
     }
 

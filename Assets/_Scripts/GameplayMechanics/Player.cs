@@ -15,6 +15,10 @@ public class Player : MonoBehaviour
 
     [SerializeField] private TextMeshProUGUI healthDisplay;
 
+    [SerializeField] private Upgrades upgrades;
+
+
+
     public void SetHandView(HandView value)
     {
         handView = value;
@@ -23,8 +27,11 @@ public class Player : MonoBehaviour
     public void DamageTaken(int damage)
     {
         Debug.Log("Player DamageTaken called with damage: " + damage);
+
+        float totalDefense = defense + upgrades.BaseDefense;
         
-        CurrentPlayerHealth -= damage;
+        int effectiveDamage = Mathf.Max(damage - (int)totalDefense, 0);  
+        CurrentPlayerHealth -= effectiveDamage;
         Debug.Log("Player health is now: " + CurrentPlayerHealth);
         
         UpdateHealthDisplay();

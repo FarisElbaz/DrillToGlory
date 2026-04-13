@@ -10,7 +10,7 @@ public enum Dimension { Reality, Void };
 public class HandView : MonoBehaviour
 {
 
-    Upgrades upgrades;
+    [SerializeField] private Upgrades upgrades;
     public enum DamageTarget { Player, Enemy }
     public Dimension currentDimension = Dimension.Reality;
 
@@ -241,6 +241,10 @@ public class HandView : MonoBehaviour
         else if (playedCard.cardData.cardType == CardData.CardType.Attack)
         {
             int damage = ApplyDimensionDamageModifier(playedCard.cardData.damage, DamageTarget.Enemy);
+            if(upgrades.BaseDamage > 0)
+            {
+                damage += Mathf.RoundToInt(upgrades.BaseDamage);
+            }
             if (targetEnemy != null)
             {
                 Debug.Log("Dealing " + damage + " damage to enemy");
@@ -472,9 +476,9 @@ public class HandView : MonoBehaviour
         StartPlayerTurn();
     }
 
-    public void IncreaseMaxMana(int amount, bool refill= true)
+    public void IncreaseMaxMana( bool refill= true)
     {
-        maxMana += amount;
+        maxMana += 1;
         if(refill)
         {
             currentMana = maxMana;
@@ -495,7 +499,7 @@ public class HandView : MonoBehaviour
             upgrades.UpgradePoints += 1;
             if(upgrades.UpgradePoints > 0)
             {
-                upgrades.OpenUpgrades();
+                upgrades.ToggleUpgrades();
             }
             else
             {

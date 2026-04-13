@@ -14,7 +14,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::CardData
   cardName: Fireball
   manaCost: 2
-  damage: 8
+  damage: 10
   defense: 0
+  heal: 0
+  cardType: 0
   cardArt: {fileID: 5826479529469629657, guid: 8f14f455503da48c2b786453a3f64976, type: 3}
   description: 
