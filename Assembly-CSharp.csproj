@@ -63,6 +63,7 @@
     <Compile Include="Assets/DOTween/Modules/DOTweenModulePhysics2D.cs" />
     <Compile Include="Assets/DOTween/Modules/DOTweenModuleUI.cs" />
     <Compile Include="Assets/_Scripts/Visuals/UiManager.cs" />
+    <Compile Include="Assets/_Scripts/Visuals/CardDescription.cs" />
     <Compile Include="Assets/TextMesh Pro/Examples &amp; Extras/Scripts/TMP_ExampleScript_01.cs" />
     <Compile Include="Assets/TextMesh Pro/Examples &amp; Extras/Scripts/TMPro_InstructionOverlay.cs" />
     <Compile Include="Assets/TextMesh Pro/Examples &amp; Extras/Scripts/VertexShakeB.cs" />

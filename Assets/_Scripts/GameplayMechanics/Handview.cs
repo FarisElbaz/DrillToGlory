@@ -22,6 +22,8 @@ public class HandView : MonoBehaviour
 
     [SerializeField] private CardViews cardPrefab;
 
+    [SerializeField] private CardDescription cardDescription;
+
     public enum GameState { PlayerTurn, EnemyTurn, Victory, Defeat}
 
     public GameObject[] enemyPool;
@@ -318,7 +320,7 @@ public class HandView : MonoBehaviour
             return false;
         }
         CardViews newCard = Instantiate(cardPrefab, transform);
-        newCard.injection(drawnData, dropZone, this);
+        newCard.injection(drawnData, dropZone, this, cardDescription);
         cardsInHand.Add(newCard);
         UpdateHandVisuals();
         if (uiManager != null)
