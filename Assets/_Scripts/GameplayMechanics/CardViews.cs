@@ -4,6 +4,8 @@ using DG.Tweening;
 using TMPro;
 using System.Linq;
 using UnityEngine.InputSystem.XR.Haptics;
+using System;
+using UnityEngine.UI;
 
 public class CardViews : MonoBehaviour, IPointerDownHandler, IDragHandler, IPointerUpHandler 
 {
@@ -27,6 +29,7 @@ public class CardViews : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoin
     [SerializeField] private TextMeshProUGUI damage;
     [SerializeField] private TextMeshProUGUI defense;
     [SerializeField] private TextMeshProUGUI description;
+    [SerializeField] private Image cardArt;
 
     public CardData cardData { get; private set; }
 
@@ -73,7 +76,7 @@ public class CardViews : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoin
 
         if (uiManager != null)
         {
-            uiManager.UpdateCardDisplay(cardName, manaCost, damage, defense, description, cardData);
+            uiManager.UpdateCardDisplay(cardName, manaCost, damage, defense, description, cardArt, cardData);
         }
         else
         {
@@ -82,6 +85,7 @@ public class CardViews : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoin
             damage.text = cardData.damage.ToString();
             defense.text = cardData.defense.ToString();
             description.text = cardData.description;
+            cardArt.sprite = cardData.cardArt;
         }
     }
     public void SetBaseTargets(Vector3 targetPos, float targetRotZ, int zIndex) 
@@ -175,31 +179,43 @@ public class CardViews : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoin
             return;
         }
 
-        Enemy target = handView.Enemies.FirstOrDefault(e =>
+        if(cardData.cardType == CardData.CardType.Attack)
         {
-            if (e == null || !e.gameObject.activeInHierarchy)
-            {
-                return false;
-            }
+            Enemy target = handView.Enemies.FirstOrDefault(e =>
+                {
+                    if (e == null || !e.gameObject.activeInHierarchy)
+                    {
+                        return false;
+                    }
 
-            RectTransform enemyRect = e.transform as RectTransform;
-            if (enemyRect == null)
-            {
-                return false;
-            }
+                    RectTransform enemyRect = e.transform as RectTransform;
+                    if (enemyRect == null)
+                    {
+                        return false;
+                    }
 
-            Camera eventCamera = eventData.pressEventCamera;
-            if (eventCamera == null && parentCanvas != null && parentCanvas.renderMode != RenderMode.ScreenSpaceOverlay)
-            {
-                eventCamera = parentCanvas.worldCamera;
-            }
+                    Camera eventCamera = eventData.pressEventCamera;
+                    if (eventCamera == null && parentCanvas != null && parentCanvas.renderMode != RenderMode.ScreenSpaceOverlay)
+                    {
+                        eventCamera = parentCanvas.worldCamera;
+                    }
 
-            return RectTransformUtility.RectangleContainsScreenPoint(enemyRect, eventData.position, eventCamera);
-        });
-
-        if (target != null)
+                    return RectTransformUtility.RectangleContainsScreenPoint(enemyRect, eventData.position, eventCamera);
+                });
+                if (target != null)
+                {
+                    handView.OnCardPlayed(this, target);
+                    return;
+                }
+        }
+        else if (cardData.cardType == CardData.CardType.Defense)
         {
-            handView.OnCardPlayed(this, target);
+            handView.OnCardPlayed(this, null);
+            return;
+        }
+        else if (cardData.cardType == CardData.CardType.Heal)
+        {
+            handView.OnCardPlayed(this, null);
             return;
         }
 

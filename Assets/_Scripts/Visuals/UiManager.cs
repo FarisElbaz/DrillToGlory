@@ -85,6 +85,7 @@ public class UiManager : MonoBehaviour
         TextMeshProUGUI damage,
         TextMeshProUGUI defense,
         TextMeshProUGUI description,
+        Image cardArt,
         CardData cardData)
     {
         if (cardData == null)
@@ -115,6 +116,11 @@ public class UiManager : MonoBehaviour
         if (description != null)
         {
             description.text = cardData.description;
+        }
+
+        if (cardArt != null)
+        {
+            cardArt.sprite = cardData.cardArt;
         }
     }
 

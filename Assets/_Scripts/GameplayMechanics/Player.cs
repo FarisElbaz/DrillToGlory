@@ -4,6 +4,9 @@ using UnityEngine;
 public class Player : MonoBehaviour
 {
     [SerializeField] private int playerHealth = 30;
+    [SerializeField] private int defense = 0;
+    
+    public int Defense { get => defense; set => defense = value; }
 
     public int CurrentPlayerHealth { get; private set; }
 
@@ -11,6 +14,10 @@ public class Player : MonoBehaviour
     [SerializeField] private UiManager uiManager;
 
     [SerializeField] private TextMeshProUGUI healthDisplay;
+
+    [SerializeField] private Upgrades upgrades;
+
+
 
     public void SetHandView(HandView value)
     {
@@ -20,8 +27,11 @@ public class Player : MonoBehaviour
     public void DamageTaken(int damage)
     {
         Debug.Log("Player DamageTaken called with damage: " + damage);
+
+        float totalDefense = defense + upgrades.BaseDefense;
         
-        CurrentPlayerHealth -= damage;
+        int effectiveDamage = Mathf.Max(damage - (int)totalDefense, 0);  
+        CurrentPlayerHealth -= effectiveDamage;
         Debug.Log("Player health is now: " + CurrentPlayerHealth);
         
         UpdateHealthDisplay();
@@ -42,6 +52,22 @@ public class Player : MonoBehaviour
 
             Debug.Log("Player Defeated!");
         }
+    }
+
+    public void regenerate(int amount)
+    {
+        if(amount <= 0){return;}
+        CurrentPlayerHealth += amount;
+        if(CurrentPlayerHealth > playerHealth)
+        {
+            CurrentPlayerHealth = playerHealth;
+        }
+        UpdateHealthDisplay();
+    }
+
+    public void defend(int defenseAmount)
+    {
+        defense = defenseAmount;
     }
 
     public void UpdateHealthDisplay()

@@ -9,19 +9,18 @@ public enum Dimension { Reality, Void };
 
 public class HandView : MonoBehaviour
 {
+
+    [SerializeField] private Upgrades upgrades;
     public enum DamageTarget { Player, Enemy }
     public Dimension currentDimension = Dimension.Reality;
 
     [SerializeField] private List<CardViews> cardsInHand = new List<CardViews>();
 
-    [Header("Cards in starting hand")]
-    [SerializeField] private List<CardData> startingHandCardData = new List<CardData>();
+    [SerializeField] private DeckManager deckManager;
 
     [SerializeField] private RectTransform dropZone;
 
     [SerializeField] private CardViews cardPrefab;
-
-    [SerializeField] private List<CardData> discardCards = new List<CardData>();
 
     public enum GameState { PlayerTurn, EnemyTurn, Victory, Defeat}
 
@@ -163,6 +162,7 @@ public class HandView : MonoBehaviour
 
         SetGameState(GameState.PlayerTurn);
         currentMana = maxMana;
+        deckManager.initilizeDeck();
 
         DrawUpToHandSize();
 
@@ -230,22 +230,34 @@ public class HandView : MonoBehaviour
             UpdateHandVisuals();
             return;
         }
-
-        int damage = ApplyDimensionDamageModifier(playedCard.cardData.damage, DamageTarget.Enemy);
+        if(playedCard.cardData.cardType == CardData.CardType.Heal)
+        {
+            playerstats.regenerate(playedCard.cardData.heal);
+        }
+        else if (playedCard.cardData.cardType == CardData.CardType.Defense)
+        {
+            playerstats.defend(playedCard.cardData.defense);
+        }
+        else if (playedCard.cardData.cardType == CardData.CardType.Attack)
+        {
+            int damage = ApplyDimensionDamageModifier(playedCard.cardData.damage, DamageTarget.Enemy);
+            if(upgrades.BaseDamage > 0)
+            {
+                damage += Mathf.RoundToInt(upgrades.BaseDamage);
+            }
+            if (targetEnemy != null)
+            {
+                Debug.Log("Dealing " + damage + " damage to enemy");
+                targetEnemy.DamageTaken(damage);
+            }
+            else
+            {
+                Debug.LogWarning("No target enemy selected.");
+            }
+        }
 
         currentMana -= playedCard.cardData.manaCost;
-        discardCards.Add(playedCard.cardData);
-
-        if (targetEnemy != null)
-        {
-            Debug.Log("Dealing " + damage + " damage to enemy");
-            targetEnemy.DamageTaken(damage);
-        }
-        else
-        {
-            Debug.LogWarning("No target enemy selected.");
-        }
-
+        deckManager.discardCardsAdd(playedCard.cardData);
         cardsInHand.Remove(playedCard);
 
         UpdateHandVisuals();
@@ -301,25 +313,10 @@ public class HandView : MonoBehaviour
             return false;
         }
 
-        if(startingHandCardData.Count == 0)
+        if(!deckManager.DrawCard(out CardData drawnData))
         {
-            if(discardCards.Count > 0)
-            {
-                Debug.Log("Reshuffling discard pile into deck");
-                startingHandCardData.AddRange(discardCards);
-                CardRandomizer(startingHandCardData);
-                discardCards.Clear();
-            }
-            else
-            {
-                Debug.Log("No cards left to draw!");
-                return false;
-            }
+            return false;
         }
-
-        currentMana = Mathf.Min(currentMana + 1, maxMana);
-        CardData drawnData = startingHandCardData[0];
-        startingHandCardData.RemoveAt(0);
         CardViews newCard = Instantiate(cardPrefab, transform);
         newCard.injection(drawnData, dropZone, this);
         cardsInHand.Add(newCard);
@@ -330,17 +327,6 @@ public class HandView : MonoBehaviour
         }
 
         return true;
-    }
-
-    private static void CardRandomizer(List<CardData> cardList)
-    {
-        for (int i = 0; i < cardList.Count; i++)
-        {
-            CardData temp = cardList[i];
-            int randomIndex = Random.Range(i, cardList.Count);
-            cardList[i] = cardList[randomIndex];
-            cardList[randomIndex] = temp;
-        }
     }
 
     public void onEndTurn()
@@ -379,6 +365,7 @@ public class HandView : MonoBehaviour
         {
             enemy.dealDamage(playerstats);
         }
+        playerstats.Defense = 0;
         BackToPlayerTurn();
     }
 
@@ -386,22 +373,10 @@ public class HandView : MonoBehaviour
     {
         cardsInHand.RemoveAll(card => card == null);
 
-        if (cardsInHand.Count == 0)
-        {
-            if (startingHandCardData.Count > 1)
-            {
-                CardRandomizer(startingHandCardData);
-            }
-            return;
-        }
+        deckManager.ReturnHandToDeckAndShuffle(cardsInHand);
 
         foreach (CardViews card in cardsInHand)
         {
-            if (card != null && card.cardData != null)
-            {
-                startingHandCardData.Add(card.cardData);
-            }
-
             if (card != null)
             {
                 Destroy(card.gameObject);
@@ -410,11 +385,6 @@ public class HandView : MonoBehaviour
 
         cardsInHand.Clear();
         UpdateHandVisuals();
-
-        if (startingHandCardData.Count > 1)
-        {
-            CardRandomizer(startingHandCardData);
-        }
     }
 
     private void DrawUpToHandSize()
@@ -506,14 +476,42 @@ public class HandView : MonoBehaviour
         StartPlayerTurn();
     }
 
+    public void IncreaseMaxMana( bool refill= true)
+    {
+        maxMana += 1;
+        if(refill)
+        {
+            currentMana = maxMana;
+        }
+        if (uiManager != null)
+        {
+            uiManager.UpdateManaDisplay(currentMana, maxMana);
+        }
+    }
+
+
     public void NextRoom()
     {
         roomCounter += 1;
+        if(upgrades != null)
+        {
+            upgrades.ApplyroomRegen();
+            upgrades.UpgradePoints += 1;
+            if(upgrades.UpgradePoints > 0)
+            {
+                upgrades.ToggleUpgrades();
+            }
+            else
+            {
+                Debug.Log("No upgrade points available");
+            }
+        }
 
         Debug.Log("Room Counter: " + roomCounter);
 
         foreach (CardViews card in cardsInHand)
         {
+            deckManager.discardCardsAdd(card.cardData);
             Destroy(card.gameObject);
         }
         cardsInHand.Clear();
