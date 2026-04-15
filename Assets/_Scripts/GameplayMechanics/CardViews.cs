@@ -3,14 +3,18 @@ using UnityEngine.EventSystems;
 using DG.Tweening;
 using TMPro;
 using System.Linq;
-using UnityEngine.InputSystem.XR.Haptics;
 using System;
 using UnityEngine.UI;
 
 public class CardViews : MonoBehaviour, IPointerDownHandler, IDragHandler, IPointerUpHandler 
 {
+    private const float DragThreshold = 10f;
+    private static CardViews selectedCard;
+
     private HandView handView;
     [SerializeField] private UiManager uiManager;
+
+    [SerializeField] private CardDescription cardDescription;
     private RectTransform cardRect;
     private RectTransform parentRect;
     private Canvas parentCanvas;
@@ -20,6 +24,8 @@ public class CardViews : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoin
     private Quaternion baseRotation; 
     private int baseZIndex;
     private bool isDragging;
+    private bool isSelected;
+    Vector2 selectedPosition;
 
     [SerializeField] private RectTransform dropZone;
 
@@ -42,11 +48,21 @@ public class CardViews : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoin
 
     private void OnDisable()
     {
+        if (selectedCard == this)
+        {
+            selectedCard = null;
+        }
+
         transform.DOKill();
     }
 
     private void OnDestroy()
     {
+        if (selectedCard == this)
+        {
+            selectedCard = null;
+        }
+
         transform.DOKill();
     }
 
@@ -55,8 +71,12 @@ public class CardViews : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoin
     {
         handView = handViewRef;
     }
+    public void SetCardDescriptionview(CardDescription cardDescriptionRef)
+    {
+        cardDescription = cardDescriptionRef;
+    }
 
-    public void injection(CardData data, RectTransform dropZoneRef, HandView handViewRef)
+    public void injection(CardData data, RectTransform dropZoneRef, HandView handViewRef, CardDescription cardDescriptionRef)
     {
         if (data == null) 
         {
@@ -72,6 +92,7 @@ public class CardViews : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoin
         cardData = data;
         dropZone = dropZoneRef;
         SetHandView(handViewRef);
+        SetCardDescriptionview(cardDescriptionRef);
         Debug.Log("SUCCESS: Injecting data for: " + data.cardName);
 
         if (uiManager != null)
@@ -111,19 +132,73 @@ public class CardViews : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoin
         transform.SetSiblingIndex(baseZIndex);
     }
 
+    private Camera ResolveEventCamera(PointerEventData eventData)
+    {
+        Camera eventCamera = eventData.pressEventCamera;
+        if (eventCamera == null && parentCanvas != null && parentCanvas.renderMode != RenderMode.ScreenSpaceOverlay)
+        {
+            eventCamera = parentCanvas.worldCamera;
+        }
+
+        return eventCamera;
+    }
+
+    private bool IsPointerOver(RectTransform targetRect, PointerEventData eventData)
+    {
+        if (targetRect == null)
+        {
+            return false;
+        }
+
+        return RectTransformUtility.RectangleContainsScreenPoint(targetRect, eventData.position, ResolveEventCamera(eventData));
+    }
+
+    private void SetSelectedVisual(bool selected)
+    {
+        isSelected = selected;
+        transform.DOKill();
+
+        if (isSelected)
+        {
+            transform.DOScale(Vector3.one * 1.5f, 0.15f).SetEase(Ease.OutBack);
+            transform.DOLocalRotateQuaternion(Quaternion.identity, 0.15f).SetEase(Ease.OutQuad);
+            return;
+        }
+
+        SendToBase();
+    }
+
+    private void DeselectAndReturnToBase()
+    {
+        isDragging = false;
+        SetSelectedVisual(false);
+
+        if (selectedCard == this)
+        {
+            selectedCard = null;
+        }
+    }
+
     public void OnPointerDown(PointerEventData eventData) 
     {
         Debug.Log("MOUSE SUCCESSFULLY CLICKED THE CARD!");
+
+        if (handView == null || handView.CurrentState != HandView.GameState.PlayerTurn)
+        {
+            return;
+        }
+
         transform.DOKill();
         transform.SetAsLastSibling(); 
 
+        if (selectedCard != null && selectedCard != this)
+        {
+            selectedCard.DeselectAndReturnToBase();
+        }
+
         if (cardRect != null && parentRect != null)
         {
-            Camera eventCamera = eventData.pressEventCamera;
-            if (eventCamera == null && parentCanvas != null && parentCanvas.renderMode != RenderMode.ScreenSpaceOverlay)
-            {
-                eventCamera = parentCanvas.worldCamera;
-            }
+            Camera eventCamera = ResolveEventCamera(eventData);
 
             if (RectTransformUtility.ScreenPointToLocalPointInRectangle(parentRect, eventData.position, eventCamera, out Vector2 localPoint))
             {
@@ -134,20 +209,17 @@ public class CardViews : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoin
                 dragOffset = Vector2.zero;
             }
         }
-        if (handView == null || handView.CurrentState != HandView.GameState.PlayerTurn)
-        {
-            return;
-        }
+        selectedPosition = eventData.position;
+        isDragging = false;
+        selectedCard = this;
 
-        isDragging = true;
-
-        transform.DOScale(Vector3.one * 0.8f, 0.15f).SetEase(Ease.OutBack);
-        transform.DOLocalRotateQuaternion(Quaternion.identity, 0.15f).SetEase(Ease.OutQuad);
+        SetSelectedVisual(true);
+        cardDescription.setCurrentCard(cardData);
     }
 
     public void OnDrag(PointerEventData eventData)
     {
-        if (handView.CurrentState != HandView.GameState.PlayerTurn)
+        if (handView == null || handView.CurrentState != HandView.GameState.PlayerTurn)
         {
             return;
         }
@@ -156,12 +228,20 @@ public class CardViews : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoin
         {
             return;
         }
-
-        Camera eventCamera = eventData.pressEventCamera;
-        if (eventCamera == null && parentCanvas != null && parentCanvas.renderMode != RenderMode.ScreenSpaceOverlay)
+        Vector2 dragDelta = eventData.position - selectedPosition;
+        if (!isDragging && dragDelta.magnitude <= DragThreshold)
         {
-            eventCamera = parentCanvas.worldCamera;
+            return;
         }
+
+        if (!isDragging)
+        {
+            isDragging = true;
+            transform.DOKill();
+            transform.DOScale(Vector3.one * 1.1f, 0.1f).SetEase(Ease.OutCubic);
+        }
+
+        Camera eventCamera = ResolveEventCamera(eventData);
 
         if (RectTransformUtility.ScreenPointToLocalPointInRectangle(parentRect, eventData.position, eventCamera, out Vector2 localPoint))
         {
@@ -171,15 +251,26 @@ public class CardViews : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoin
 
     public void OnPointerUp(PointerEventData eventData) 
     {
-        isDragging = false;
+        if (handView == null || handView.CurrentState != HandView.GameState.PlayerTurn)
+        {
+            DeselectAndReturnToBase();
+            return;
+        }
+
+        if (!isDragging)
+        {
+            SetSelectedVisual(true);
+            return;
+        }
 
         if (dropZone == null || handView == null)
         {
+            isDragging = false;
             SendToBase();
             return;
         }
 
-        if(cardData.cardType == CardData.CardType.Attack)
+        if (cardData.cardType == CardData.CardType.Attack)
         {
             Enemy target = handView.Enemies.FirstOrDefault(e =>
                 {
@@ -194,31 +285,33 @@ public class CardViews : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoin
                         return false;
                     }
 
-                    Camera eventCamera = eventData.pressEventCamera;
-                    if (eventCamera == null && parentCanvas != null && parentCanvas.renderMode != RenderMode.ScreenSpaceOverlay)
-                    {
-                        eventCamera = parentCanvas.worldCamera;
-                    }
-
-                    return RectTransformUtility.RectangleContainsScreenPoint(enemyRect, eventData.position, eventCamera);
+                    return IsPointerOver(enemyRect, eventData);
                 });
                 if (target != null)
                 {
+                    isDragging = false;
+                    isSelected = false;
+                    if (selectedCard == this)
+                    {
+                        selectedCard = null;
+                    }
                     handView.OnCardPlayed(this, target);
                     return;
                 }
         }
-        else if (cardData.cardType == CardData.CardType.Defense)
+        else if ((cardData.cardType == CardData.CardType.Defense || cardData.cardType == CardData.CardType.Heal) && IsPointerOver(dropZone, eventData))
         {
-            handView.OnCardPlayed(this, null);
-            return;
-        }
-        else if (cardData.cardType == CardData.CardType.Heal)
-        {
+            isDragging = false;
+            isSelected = false;
+            if (selectedCard == this)
+            {
+                selectedCard = null;
+            }
             handView.OnCardPlayed(this, null);
             return;
         }
 
+        isDragging = false;
         SendToBase();
     }
 }
