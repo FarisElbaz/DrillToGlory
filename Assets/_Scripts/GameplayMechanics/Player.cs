@@ -14,6 +14,7 @@ public class Player : MonoBehaviour
     [SerializeField] private UiManager uiManager;
 
     [SerializeField] private TextMeshProUGUI healthDisplay;
+    [SerializeField] private TextMeshProUGUI defenseDisplay;
 
     [SerializeField] private Upgrades upgrades;
 
@@ -68,6 +69,7 @@ public class Player : MonoBehaviour
     public void defend(int defenseAmount)
     {
         defense += defenseAmount;
+        UpdateDefenseDisplay();
     }
 
     public void UpdateHealthDisplay()
@@ -84,11 +86,26 @@ public class Player : MonoBehaviour
         uiManager.UpdatePlayerHealthDisplay(healthDisplay, CurrentPlayerHealth);
     }
 
+    public void UpdateDefenseDisplay()
+    {
+        if (uiManager == null)
+        {
+            if (defenseDisplay != null)
+            {
+                defenseDisplay.text = $"Defense: {defense}";
+            }
+            return;
+        }
+
+        uiManager.UpdateDefenseDisplay(defenseDisplay, defense);
+    }
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
         CurrentPlayerHealth = playerHealth;
         UpdateHealthDisplay();
+        UpdateDefenseDisplay();
     }
 
 }

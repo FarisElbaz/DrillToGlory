@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -238,6 +239,7 @@ public class HandView : MonoBehaviour
         else if (playedCard.cardData.cardType == CardData.CardType.Defense)
         {
             playerstats.defend(playedCard.cardData.defense);
+            playerstats.UpdateDefenseDisplay();
         }
         else if (playedCard.cardData.cardType == CardData.CardType.Attack)
         {
@@ -356,6 +358,7 @@ public class HandView : MonoBehaviour
             enemy.dealDamage(playerstats);
         }
         playerstats.Defense = 0;
+        playerstats.UpdateDefenseDisplay();
         BackToPlayerTurn();
     }
 
@@ -442,6 +445,7 @@ public class HandView : MonoBehaviour
         currentMana = maxMana;
         DrawUpToHandSize();
         UpdateHandVisuals();
+        uiManager.UpdateManaDisplay(currentMana, maxMana);
         if (uiManager != null)
         {
             uiManager.UpdateManaDisplay(currentMana, maxMana);

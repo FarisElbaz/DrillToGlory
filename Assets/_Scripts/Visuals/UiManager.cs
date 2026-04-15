@@ -69,6 +69,17 @@ public class UiManager : MonoBehaviour
         healthDisplay.text = $"Player Health: {currentHealth}";
     }
 
+    public void UpdateDefenseDisplay(TextMeshProUGUI defenseDisplay, int currentDefense)
+    {
+        if (defenseDisplay == null)
+        {
+            Debug.LogWarning("Defense display is not assigned.");
+            return;
+        }
+
+        defenseDisplay.text = $"Defense: {currentDefense}";
+    }
+
     public void UpdateEnemyHealthDisplay(TextMeshProUGUI healthDisplay, int currentHealth)
     {
         if (healthDisplay == null)
