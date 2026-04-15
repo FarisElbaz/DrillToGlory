@@ -67,7 +67,7 @@ public class Player : MonoBehaviour
 
     public void defend(int defenseAmount)
     {
-        defense = defenseAmount;
+        defense += defenseAmount;
     }
 
     public void UpdateHealthDisplay()
