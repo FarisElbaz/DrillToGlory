@@ -11,11 +11,17 @@ public class CardDescription : MonoBehaviour
     [SerializeField] private TextMeshProUGUI manaCostText;
     [SerializeField] private TextMeshProUGUI actionValueText;
     [SerializeField] private Image cardArt;
+    [SerializeField] private TextMeshProUGUI cardTypeText;
 
     private CardData currentCardData;
 
     public void UpdateCardPanel(CardData cardData)
     {
+        if (cardData == null)
+        {
+            return;
+        }
+
         if(cardData.cardType == CardData.CardType.Attack)
         {
             actionValueText.text = "Damage: " + cardData.damage;
@@ -32,6 +38,7 @@ public class CardDescription : MonoBehaviour
         manaCostText.text = "Mana Cost: " + cardData.manaCost;
         descriptionText.text = cardData.description;
         cardArt.sprite = cardData.cardArt;
+        cardTypeText.text = "Card Type: " + cardData.cardType.ToString();
     }
 
     public void setCurrentCard(CardData cardData)
@@ -41,6 +48,12 @@ public class CardDescription : MonoBehaviour
 
     public void OpenCardPanel()
     {
+        if (currentCardData == null)
+        {
+            Debug.LogWarning("CardDescription.OpenCardPanel called without a selected card.");
+            return;
+        }
+
         UpdateCardPanel(currentCardData);
         cardPanel.SetActive(true);
     }

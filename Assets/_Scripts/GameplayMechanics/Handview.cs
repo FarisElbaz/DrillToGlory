@@ -1,7 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using DG.Tweening;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -310,11 +309,6 @@ public class HandView : MonoBehaviour
             return false;
         }
 
-        if (currentState == GameState.Victory || currentState == GameState.Defeat)
-        {
-            return false;
-        }
-
         if(!deckManager.DrawCard(out CardData drawnData))
         {
             return false;
@@ -339,12 +333,6 @@ public class HandView : MonoBehaviour
         {
             Debug.LogWarning("Player stats reference is missing.");
             SetGameState(GameState.PlayerTurn);
-            return;
-        }
-        
-        if (currentState == GameState.Victory || currentState == GameState.Defeat)
-        {
-            Debug.Log("Game is over, cannot end turn");
             return;
         }
 
@@ -458,24 +446,6 @@ public class HandView : MonoBehaviour
         {
             uiManager.UpdateManaDisplay(currentMana, maxMana);
         }
-    }
-
-    IEnumerator EnemyTurnSequence()
-    {
-        SetGameState(GameState.EnemyTurn);
-
-        List<Enemy> targets = new List<Enemy>(enemies);
-
-        foreach (Enemy enemy in targets)
-        {
-           if (enemy == null) continue;
-        
-            enemy.TakeTurn(playerstats);
-        
-            yield return new WaitForSeconds(0.6f);
-        }
-
-        StartPlayerTurn();
     }
 
     public void IncreaseMaxMana( bool refill= true)
