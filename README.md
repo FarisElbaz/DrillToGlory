@@ -5,11 +5,12 @@
 ## 🚀 Features
 
 - **Rogue-like Mechanics**: Each run is unique, featuring procedural elements and permanent upgrades.
-- **Dynamic Deck-building**: Collect and refine your deck of cards to create powerful synergies.
+- **Dynamic Deck**: No two runs are alike, test your luck and see how you fare.
 - **Spiral Power Energy**: Visuals and mechanics inspired by *Gurren Lagann*, including drill-themed abilities and evolving power scales.
-- **Enemy System**: Battle through waves of unique enemies and challenging bosses.
+- **Enemy System**: Battle through rooms of unique enemies.
 - **Cloud Integration**: Features Firebase authentication and Firestore cloud saving to keep your progress synced.
-- **Visual Polish**: Custom shaders (ShaderLab/HLSL) and DOTween animations for a high-impact combat experience.
+- **Visual Polish**: DOTween animations for a high-impact combat experience.
+- **Challenge your Friends**: See the top 3 
 
 ## 🛠 Tech Stack
 
