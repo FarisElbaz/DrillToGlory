@@ -17,14 +17,26 @@ public class Firestoresaving : MonoBehaviour
 
     public void SaveHighestRoom(int highestRoom)
     {
+        if (authManager == null || authManager.User == null)
+        {
+            Debug.LogWarning("Skipping Firestore save because no authenticated user is available.");
+            return;
+        }
+
         string userID = authManager.CurrentUserId.ToString();
-        string userName = authManager.User.DisplayName;
+        string userName = string.IsNullOrWhiteSpace(authManager.User.DisplayName) ? "Test Player" : authManager.User.DisplayName;
         DocumentReference leaderboard = db.Collection("Leaderboard").Document(userID);
         leaderboard.SetAsync(new { username = userName, highestroom = highestRoom});
     }
 
     public async Task GetCurrentHighest(string uid)
     {
+        if (authManager == null || authManager.User == null || string.IsNullOrWhiteSpace(uid))
+        {
+            currenthighestRoom = 0;
+            return;
+        }
+
         DocumentReference leaderboard = db.Collection("Leaderboard").Document(uid);   
         DocumentSnapshot snapshot = await leaderboard.GetSnapshotAsync();
 
@@ -43,6 +55,13 @@ public class Firestoresaving : MonoBehaviour
 
     public async Task GetTop3()
     {
+        if (authManager == null || authManager.User == null)
+        {
+            leaderboardCache.Clear();
+            return;
+        }
+
+        leaderboardCache.Clear();
         Query top3Query = db.Collection("Leaderboard").OrderByDescending("highestroom").Limit(3);
         QuerySnapshot querySnapshot = await top3Query.GetSnapshotAsync();
         foreach (DocumentSnapshot documentSnapshot in querySnapshot.Documents)

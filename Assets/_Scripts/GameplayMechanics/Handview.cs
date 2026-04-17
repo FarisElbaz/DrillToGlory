@@ -50,14 +50,8 @@ public class HandView : MonoBehaviour
 
     [SerializeField] private int currentMana = 0;
 
-    private string userID;
-
-    private AuthManager authManager;
-
     private void Awake()
     {
-        authManager = AuthManager.Instance;
-        userID = authManager.CurrentUserId;
     }
 
     [Header("Dimension Damage Modifiers")]
@@ -83,8 +77,6 @@ public class HandView : MonoBehaviour
 
     void Start()
     {
-        authManager = AuthManager.Instance;
-
         if (enemyManager != null && enemyManager.CanSpawn)
         {
             int enemyCount = Mathf.Max(1, baseEnemiesPerRoom);

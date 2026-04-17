@@ -15,9 +15,7 @@ public class Enemy : MonoBehaviour
     [SerializeField] private TextMeshProUGUI healthDisplay;
 
     [SerializeField] EnemyType enemytype;
-
-
-     public enum EnemyType
+    public enum EnemyType
     {
         Aggro,
         Tank,

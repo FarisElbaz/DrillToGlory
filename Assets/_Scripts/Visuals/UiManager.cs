@@ -4,7 +4,6 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using System.Threading.Tasks;
-using System.Collections.Generic;
 using System.Linq;
 
 public class UiManager : MonoBehaviour
@@ -81,7 +80,7 @@ public class UiManager : MonoBehaviour
             return;
         }
 
-        healthDisplay.text = $"Player Health: {currentHealth}";
+        healthDisplay.text = $"Health: {currentHealth}";
     }
 
     public void UpdateDefenseDisplay(TextMeshProUGUI defenseDisplay, int currentDefense)
@@ -102,17 +101,56 @@ public class UiManager : MonoBehaviour
             Debug.LogError("Firestoresaving is not assigned on UiManager!");
             return;
         }
+        // So i can test the game without logging in everytime.
+        AuthManager authManager = AuthManager.Instance;
+        if (authManager == null || authManager.User == null)
+        {
+            if (currentPlayer != null)
+            {
+                currentPlayer.text = "You (Offline Test)";
+            }
+
+            if (recordedHighscore != null)
+            {
+                recordedHighscore.text = "0";
+            }
+
+            if (firstPlace != null)
+            {
+                firstPlace.text = "Leaderboard requires login";
+            }
+
+            if (secondPlace != null)
+            {
+                secondPlace.text = "";
+            }
+
+            if (thirdPlace != null)
+            {
+                thirdPlace.text = "";
+            }
+
+            return;
+        }
 
         await firestoreSaving.GetTop3();
         var top3 = firestoreSaving.Top3Players;
         
-        string currentUserId = AuthManager.Instance.CurrentUserId;
+        string currentUserId = authManager.CurrentUserId;
         await firestoreSaving.GetCurrentHighest(currentUserId);
         int currentUserScore = firestoreSaving.CurrentHighestRoom;
         
         Debug.Log($"Leaderboard updated - Top 3 count: {top3.Count}, Current user score: {currentUserScore}");
         
-        string userName = AuthManager.Instance.User.DisplayName;
+        string userName;
+        if (authManager.User.DisplayName != null)
+        {
+            userName = authManager.User.DisplayName;
+        }
+        else
+        {
+            userName = "Test Player";
+        }
         if (currentPlayer != null)
         {
             currentPlayer.text = $"You ({userName}):";
