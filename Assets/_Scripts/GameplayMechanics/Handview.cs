@@ -10,7 +10,6 @@ public class HandView : MonoBehaviour
 {
 
     [SerializeField] private Upgrades upgrades;
-    public enum DamageTarget { Player, Enemy }
     public Dimension currentDimension = Dimension.Reality;
 
     [SerializeField] private List<CardViews> cardsInHand = new List<CardViews>();
@@ -24,6 +23,8 @@ public class HandView : MonoBehaviour
     [SerializeField] private CardViews cardPrefab;
 
     [SerializeField] private CardDescription cardDescription;
+    [SerializeField] private CardEffectResolver cardEffectResolver;
+    [SerializeField] private TurnController turnController;
 
     public enum GameState { PlayerTurn, EnemyTurn, Victory, Defeat}
 
@@ -54,12 +55,6 @@ public class HandView : MonoBehaviour
     {
     }
 
-    [Header("Dimension Damage Modifiers")]
-    [SerializeField] private float realityDamageToPlayerMultiplier = 1f;
-    [SerializeField] private float realityDamageToEnemyMultiplier = 1f;
-    [SerializeField] private float voidDamageToPlayerMultiplier = 1.25f;
-    [SerializeField] private float voidDamageToEnemyMultiplier = 1.5f;
-
     public GameState CurrentState => currentState;
     public int CurrentMana => currentMana;
     public int MaxMana => maxMana;
@@ -88,6 +83,16 @@ public class HandView : MonoBehaviour
         SetGameState(GameState.PlayerTurn);
         currentMana = maxMana;
         deckManager.InitilizeDeck();
+
+        if (turnController != null)
+        {
+            turnController.Initialize(this, playerstats);
+        }
+
+        if (uiManager != null)
+        {
+            uiManager.UpdateManaDisplay(currentMana, maxMana);
+        }
 
         DrawUpToHandSize();
 
@@ -149,31 +154,13 @@ public class HandView : MonoBehaviour
             UpdateHandVisuals();
             return;
         }
-        if(playedCard.cardData.cardType == CardData.CardType.Heal)
+        if (cardEffectResolver != null)
         {
-            playerstats.regenerate(playedCard.cardData.heal);
+            cardEffectResolver.CardPlayer(playedCard.cardData, playerstats, targetEnemy, upgrades, currentDimension);
         }
-        else if (playedCard.cardData.cardType == CardData.CardType.Defense)
+        else
         {
-            playerstats.defend(playedCard.cardData.defense);
-            playerstats.UpdateDefenseDisplay();
-        }
-        else if (playedCard.cardData.cardType == CardData.CardType.Attack)
-        {
-            int damage = ApplyDimensionDamageModifier(playedCard.cardData.damage, DamageTarget.Enemy);
-            if(upgrades.BaseDamage > 0)
-            {
-                damage += Mathf.RoundToInt(upgrades.BaseDamage);
-            }
-            if (targetEnemy != null)
-            {
-                Debug.Log("Dealing " + damage + " damage to enemy");
-                targetEnemy.DamageTaken(damage);
-            }
-            else
-            {
-                Debug.LogWarning("No target enemy selected.");
-            }
+            Debug.LogWarning("CardEffectResolver reference is missing.");
         }
 
         currentMana -= playedCard.cardData.manaCost;
@@ -189,37 +176,6 @@ public class HandView : MonoBehaviour
         {
             uiManager.UpdateManaDisplay(currentMana, maxMana);
         }
-    }
-
-    public int ApplyDimensionDamageModifier(int baseDamage, DamageTarget target)
-    {
-        float multiplier = 1f;
-
-        if (currentDimension == Dimension.Reality)
-        {
-            if(target == DamageTarget.Player)
-            {
-                multiplier = realityDamageToPlayerMultiplier;
-            }
-            else
-            {
-                multiplier = realityDamageToEnemyMultiplier;
-            }
-        }
-        else if (currentDimension == Dimension.Void)
-        {
-            if(target == DamageTarget.Player)
-            {
-                multiplier = voidDamageToPlayerMultiplier;
-            }
-            else
-            {
-                multiplier = voidDamageToEnemyMultiplier;
-            }
-        }
-
-        int modifiedDamage = Mathf.Max(0, Mathf.RoundToInt(baseDamage * multiplier));
-        return modifiedDamage;
     }
 
     public void onDrawCardButton()
@@ -252,40 +208,16 @@ public class HandView : MonoBehaviour
 
     public void onEndTurn()
     {
-        Debug.Log("onEndTurn called, current state: " + currentState);
-
-        if( playerstats == null)
+        if (turnController != null)
         {
-            Debug.LogWarning("Player stats reference is missing.");
-            SetGameState(GameState.PlayerTurn);
+            turnController.EndTurn();
             return;
         }
 
-        if (currentState != GameState.PlayerTurn)
-        {
-            Debug.Log("Not player's turn, cannot end turn");
-            return;
-        }
-
-        ReturnHandToDeckAndShuffle();
-
-        Debug.Log("Transitioning to Enemy Turn");
-        SetGameState(GameState.EnemyTurn);
-
-        Debug.Log("Enemy dealing damage to player");
-
-        var validEnemies = enemies.Where(e => e != null).ToList();
-
-        foreach (var enemy in validEnemies)
-        {
-            enemy.dealDamage(playerstats);
-        }
-        playerstats.Defense = 0;
-        playerstats.UpdateDefenseDisplay();
-        BackToPlayerTurn();
+        Debug.LogWarning("TurnController reference is missing.");
     }
 
-    private void ReturnHandToDeckAndShuffle()
+    public void ReturnHandToDeckAndShuffle()
     {
         cardsInHand.RemoveAll(card => card == null);
 
@@ -320,46 +252,14 @@ public class HandView : MonoBehaviour
 
     public void RemoveEnemy(Enemy deadEnemy)
     {
+        if (turnController != null)
+        {
+            turnController.HandleEnemyRemoved(deadEnemy);
+            return;
+        }
+
+        Debug.LogWarning("TurnController reference is missing.");
         enemies.RemoveAll(e => e == null || e == deadEnemy || e.CurrentHealth <= 0);
-        CheckForVictory();
-    }
-
-    private void CheckForVictory()
-    {
-        if (currentState == GameState.Defeat)
-        {
-            return;
-        }
-
-        enemies.RemoveAll(e => e == null || e.CurrentHealth <= 0);
-
-        Enemy[] activeSceneEnemies = FindObjectsByType<Enemy>(FindObjectsSortMode.None);
-        bool hasLivingEnemyInScene = activeSceneEnemies.Any(e => e != null && e.CurrentHealth > 0);
-
-        if (!hasLivingEnemyInScene && enemies.Count == 0)
-        {
-            Debug.Log("All enemies defeated, transitioning to Victory state");
-            SetGameState(GameState.Victory);
-        }
-    }
-
-    public void BackToPlayerTurn()
-    {
-        if (currentState == GameState.Victory || currentState == GameState.Defeat)
-        {
-            return;
-        }
-
-        Debug.Log("Transitioning from Enemy Turn to Player Turn - 5 second delay starting");
-        StartCoroutine(TransitionToPlayerTurnDelayed());
-    }
-
-    private IEnumerator TransitionToPlayerTurnDelayed()
-    {
-        yield return new WaitForSeconds(3f);
-        Debug.Log("Transitioning to Player Turn NOW");
-        
-        StartPlayerTurn();
     }
 
     public void StartPlayerTurn()
@@ -368,7 +268,6 @@ public class HandView : MonoBehaviour
         currentMana = maxMana;
         DrawUpToHandSize();
         UpdateHandVisuals();
-        uiManager.UpdateManaDisplay(currentMana, maxMana);
         if (uiManager != null)
         {
             uiManager.UpdateManaDisplay(currentMana, maxMana);
@@ -437,9 +336,24 @@ public class HandView : MonoBehaviour
         UpdateHandVisuals();
     }
 
-    public void DimensionSwitchVisuals()
+    public void DimensionSwitch()
     {
-        currentDimension = currentDimension == Dimension.Reality ? Dimension.Void : Dimension.Reality;
+        if(currentDimension == Dimension.Reality)
+        {
+            currentDimension = Dimension.Void;
+            if (uiManager != null)
+            {
+                uiManager.DimensionSwitchVisuals(currentDimension);
+            }
+        }
+        else
+        {
+            currentDimension = Dimension.Reality;
+            if (uiManager != null)
+            {
+                uiManager.DimensionSwitchVisuals(currentDimension);
+            }
+        }
     }
 
     public void ReturnToStart()

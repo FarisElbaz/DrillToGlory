@@ -8,6 +8,11 @@ using System.Linq;
 
 public class UiManager : MonoBehaviour
 {
+    [Header("Dimension VFX")]
+    [SerializeField] private Camera shakeCamera;
+    [SerializeField] private float dimensionShakeDuration = 0.35f;
+    [SerializeField] private float dimensionShakeStrength = 3f;
+
     [SerializeField] private Image backgroundUI;
     [SerializeField] private Color realityColor = Color.white;
     [SerializeField] private Color voidColor = new Color(0.5f, 0, 0.5f);
@@ -235,13 +240,25 @@ public class UiManager : MonoBehaviour
     {
         if (backgroundUI != null)
         {
-            backgroundUI.color = currentDimension == Dimension.Reality ? realityColor : voidColor;
+            if(currentDimension == Dimension.Reality)
+            {
+                backgroundUI.DOColor(realityColor, 1f);
+            }
+            else
+            {
+                backgroundUI.DOColor(voidColor, 1f);
+            }
         }
 
+        
         if (Camera.main != null)
         {
-            Camera.main.DOShakeRotation(0.5f, 10f);
-            Camera.main.DOShakePosition(0.5f, 10f);
+            Camera.main.transform.DOShakeRotation(dimensionShakeDuration, dimensionShakeStrength);
+            Camera.main.transform.DOShakePosition(dimensionShakeDuration, dimensionShakeStrength);
+        }
+        else
+        {
+            Debug.LogWarning("No camera found for shake. Assign shakeCamera on UiManager or tag one camera as MainCamera.");
         }
     }
 
@@ -283,7 +300,9 @@ public class UiManager : MonoBehaviour
     private void Start()
     {
         Application.targetFrameRate = 60;
+
         SetGameState(lastKnownState);
+
         if (leaderboardPanel != null)
         {
             leaderboardPanel.SetActive(false);
