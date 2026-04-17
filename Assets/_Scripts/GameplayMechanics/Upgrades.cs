@@ -1,6 +1,4 @@
-using TMPro;
 using UnityEngine;
-using UnityEngine.XR;
 
 public class Upgrades : MonoBehaviour
 {
