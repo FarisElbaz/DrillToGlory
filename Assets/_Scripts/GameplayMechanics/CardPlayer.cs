@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class CardEffectResolver : MonoBehaviour
+public class CardPlayer : MonoBehaviour
 {
     [SerializeField] private float realityDamageToPlayerMultiplier = 1f;
     [SerializeField] private float realityDamageToEnemyMultiplier = 1f;
@@ -13,7 +13,7 @@ public class CardEffectResolver : MonoBehaviour
         Enemy
     }
 
-    public void CardPlayer(CardData cardData, Player player, Enemy targetEnemy, Upgrades upgrades, Dimension currentDimension)
+    public void CardClasses(CardData cardData, Player player, Enemy targetEnemy, Upgrades upgrades, Dimension currentDimension)
     {
         if (cardData == null || player == null)
         {

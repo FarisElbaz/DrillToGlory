@@ -77,7 +77,7 @@ public class AuthenticationScript : MonoBehaviour
         return AuthManager.Instance.User;
     }
 
-    public void EnterGame()
+    public void EnterMainMenu()
     {
         SceneManager.LoadScene(1);
     }
@@ -98,6 +98,11 @@ public class AuthenticationScript : MonoBehaviour
     void Start()
     {
         _ = AuthManager.Instance;
+        if (AuthManager.Instance.User != null)
+        {
+            Debug.Log("User already logged in, skipping login screen.");
+            EnterMainMenu();
+        }
         loginPanel.SetActive(true);
         SignUpPanel.SetActive(false);
     }

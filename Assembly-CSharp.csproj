@@ -105,6 +105,7 @@
     <Compile Include="Assets/_Scripts/GameplayMechanics/EnemySpawner.cs" />
     <Compile Include="Assets/TextMesh Pro/Examples &amp; Extras/Scripts/CameraController.cs" />
     <Compile Include="Assets/TextMesh Pro/Examples &amp; Extras/Scripts/Benchmark03.cs" />
+    <Compile Include="Assets/_Scripts/Visuals/BackgroundMusicPersistence.cs" />
     <Compile Include="Assets/Firebase/FirebaseAI/FirebaseAI.cs" />
     <Compile Include="Assets/Firebase/FirebaseAI/TemplateGenerativeModel.cs" />
     <Compile Include="Assets/Firebase/FirebaseApp/Internal/FirebaseInterops.cs" />

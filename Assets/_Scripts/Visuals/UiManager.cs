@@ -34,6 +34,9 @@ public class UiManager : MonoBehaviour
     
     [SerializeField] private Firestoresaving firestoreSaving;
 
+    [SerializeField] private TextMeshProUGUI victoryLevelText;
+    [SerializeField] private TextMeshProUGUI defeatLevelText;
+
     private HandView.GameState lastKnownState = HandView.GameState.PlayerTurn;
 
     public void InitializeUi(HandView.GameState currentState, int currentMana, int maxMana)
@@ -42,7 +45,29 @@ public class UiManager : MonoBehaviour
         UpdateManaDisplay(currentMana, maxMana);
     }
 
-    public void SetGameState(HandView.GameState currentState)
+    public void SetCurrentLevel(int currentLevel, HandView.GameState currentState)
+    {
+        string levelText = currentLevel.ToString();
+
+        if (currentState == HandView.GameState.Victory)
+        {
+            if (victoryLevelText != null)
+            {
+                victoryLevelText.text = levelText;
+            }
+            return;
+        }
+
+        if (currentState == HandView.GameState.Defeat)
+        {
+            if (defeatLevelText != null)
+            {
+                defeatLevelText.text = levelText;
+            }
+        }
+    }
+
+    public void SetGameState(HandView.GameState currentState, int currentRoom = 0)
     {
         lastKnownState = currentState;
 
@@ -64,6 +89,11 @@ public class UiManager : MonoBehaviour
         if (defeatScreen != null)
         {
             defeatScreen.SetActive(currentState == HandView.GameState.Defeat);
+        }
+
+        if (currentState == HandView.GameState.Victory || currentState == HandView.GameState.Defeat)
+        {
+            SetCurrentLevel(currentRoom, currentState);
         }
     }
 
@@ -282,6 +312,7 @@ public class UiManager : MonoBehaviour
     public void PlayGame()
     {
         DOTween.KillAll();
+        BackgroundMusicPersistence.MuteMusic();
         SceneManager.LoadScene(2);
     }
 
@@ -294,7 +325,7 @@ public class UiManager : MonoBehaviour
     public void Logout()
     {
         AuthManager.Instance.Auth.SignOut();
-        ReturnToMainMenu();
+        SceneManager.LoadScene(0);
     }
 
     private void Start()

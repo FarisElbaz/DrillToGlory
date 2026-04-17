@@ -23,7 +23,7 @@ public class HandView : MonoBehaviour
     [SerializeField] private CardViews cardPrefab;
 
     [SerializeField] private CardDescription cardDescription;
-    [SerializeField] private CardEffectResolver cardEffectResolver;
+    [SerializeField] private CardPlayer cardPlayer;
     [SerializeField] private TurnController turnController;
 
     public enum GameState { PlayerTurn, EnemyTurn, Victory, Defeat}
@@ -51,6 +51,8 @@ public class HandView : MonoBehaviour
 
     [SerializeField] private int currentMana = 0;
 
+    private bool SwitchedDimensionAlready = false;
+
     private void Awake()
     {
     }
@@ -66,7 +68,7 @@ public class HandView : MonoBehaviour
         currentState = newState;
         if (uiManager != null)
         {
-            uiManager.SetGameState(currentState);
+            uiManager.SetGameState(currentState, roomCounter);
         }
     }
 
@@ -154,13 +156,13 @@ public class HandView : MonoBehaviour
             UpdateHandVisuals();
             return;
         }
-        if (cardEffectResolver != null)
+        if (cardPlayer != null)
         {
-            cardEffectResolver.CardPlayer(playedCard.cardData, playerstats, targetEnemy, upgrades, currentDimension);
+            cardPlayer.CardClasses(playedCard.cardData, playerstats, targetEnemy, upgrades, currentDimension);
         }
         else
         {
-            Debug.LogWarning("CardEffectResolver reference is missing.");
+            Debug.LogWarning("CardPlayer reference is missing.");
         }
 
         currentMana -= playedCard.cardData.manaCost;
@@ -180,10 +182,12 @@ public class HandView : MonoBehaviour
 
     public void onDrawCardButton()
     {
-        if (!DrawCard())
+        if (currentState != GameState.PlayerTurn)
         {
             return;
         }
+
+        ReturnHandToDeckAndShuffle();
         onEndTurn();
     }
 
@@ -266,6 +270,7 @@ public class HandView : MonoBehaviour
     {
         SetGameState(GameState.PlayerTurn);
         currentMana = maxMana;
+        SwitchedDimensionAlready = false;
         DrawUpToHandSize();
         UpdateHandVisuals();
         if (uiManager != null)
@@ -338,6 +343,14 @@ public class HandView : MonoBehaviour
 
     public void DimensionSwitch()
     {
+        if (SwitchedDimensionAlready)
+        {
+            Debug.Log("Dimension switch already used this turn.");
+            return;
+        }
+
+        SwitchedDimensionAlready = true;
+
         if(currentDimension == Dimension.Reality)
         {
             currentDimension = Dimension.Void;
@@ -359,6 +372,14 @@ public class HandView : MonoBehaviour
     public void ReturnToStart()
     {
         if(currentState == GameState.Defeat)
+        {
+            BackgroundMusicPersistence.MuteMusic();
+            SceneManager.LoadScene(2);
+        }
+    }
+    public void ReturnToMainMenu()
+    {
+        if (currentState == GameState.Defeat || currentState == GameState.Victory)
         {
             SceneManager.LoadScene(1);
         }
