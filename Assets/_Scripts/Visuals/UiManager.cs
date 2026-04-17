@@ -2,6 +2,10 @@ using DG.Tweening;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
+using System.Threading.Tasks;
+using System.Collections.Generic;
+using System.Linq;
 
 public class UiManager : MonoBehaviour
 {
@@ -14,6 +18,17 @@ public class UiManager : MonoBehaviour
     [Header("End Screens")]
     [SerializeField] private GameObject victoryScreen;
     [SerializeField] private GameObject defeatScreen;
+
+    [SerializeField] private GameObject leaderboardPanel; 
+
+    [SerializeField] private TextMeshProUGUI firstPlace;
+    [SerializeField] private TextMeshProUGUI secondPlace;
+    [SerializeField] private TextMeshProUGUI thirdPlace;
+    [SerializeField] private TextMeshProUGUI currentPlayer;
+
+    [SerializeField] private TextMeshProUGUI recordedHighscore;
+    
+    [SerializeField] private Firestoresaving firestoreSaving;
 
     private HandView.GameState lastKnownState = HandView.GameState.PlayerTurn;
 
@@ -78,6 +93,49 @@ public class UiManager : MonoBehaviour
         }
 
         defenseDisplay.text = $"Defense: {currentDefense}";
+    }
+
+    public async Task UpdateLeaderBoard()
+    {
+        if (firestoreSaving == null)
+        {
+            Debug.LogError("Firestoresaving is not assigned on UiManager!");
+            return;
+        }
+
+        await firestoreSaving.GetTop3();
+        var top3 = firestoreSaving.Top3Players;
+        
+        string currentUserId = AuthManager.Instance.CurrentUserId;
+        await firestoreSaving.GetCurrentHighest(currentUserId);
+        int currentUserScore = firestoreSaving.CurrentHighestRoom;
+        
+        Debug.Log($"Leaderboard updated - Top 3 count: {top3.Count}, Current user score: {currentUserScore}");
+        
+        string userName = AuthManager.Instance.User.DisplayName;
+        if (currentPlayer != null)
+        {
+            currentPlayer.text = $"You ({userName}):";
+        }
+        if (recordedHighscore != null)
+        {
+            recordedHighscore.text = currentUserScore.ToString();
+        }
+        
+        // Display top 3
+        if (top3.Count == 0)
+        {
+            firstPlace.text = "No players yet!";
+            secondPlace.text = "";
+            thirdPlace.text = "";
+            return;
+        }
+        else
+        {
+            firstPlace.text = $"{top3.Keys.ElementAt(0)}: {top3.Values.ElementAt(0)}";
+            secondPlace.text = $"{top3.Keys.ElementAt(1)}: {top3.Values.ElementAt(1)}";
+            thirdPlace.text = $"{top3.Keys.ElementAt(2)}: {top3.Values.ElementAt(2)}";
+        }
     }
 
     public void UpdateEnemyHealthDisplay(TextMeshProUGUI healthDisplay, int currentHealth)
@@ -149,8 +207,50 @@ public class UiManager : MonoBehaviour
         }
     }
 
+    public void OpenLeaderboard()
+    {
+        if (leaderboardPanel != null)
+        {
+            leaderboardPanel.SetActive(true);
+            _= UpdateLeaderBoard();
+        }
+    }
+
+    public void CloseLeaderboard()
+    {
+        if (leaderboardPanel != null)
+        {
+            leaderboardPanel.SetActive(false);
+        }
+    }
+
+    public void PlayGame()
+    {
+        DOTween.KillAll();
+        SceneManager.LoadScene(2);
+    }
+
+    public void ReturnToMainMenu()
+    {
+        DOTween.KillAll();
+        SceneManager.LoadScene(1);
+    }
+
+    public void Logout()
+    {
+        AuthManager.Instance.Auth.SignOut();
+        ReturnToMainMenu();
+    }
+
     private void Start()
     {
+        Application.targetFrameRate = 60;
         SetGameState(lastKnownState);
+        if (leaderboardPanel != null)
+        {
+            leaderboardPanel.SetActive(false);
+        }
     }
+
+
 }

@@ -3,7 +3,6 @@ using UnityEngine.EventSystems;
 using DG.Tweening;
 using TMPro;
 using System.Linq;
-using System;
 using UnityEngine.UI;
 
 public class CardViews : MonoBehaviour, IPointerDownHandler, IDragHandler, IPointerUpHandler 
@@ -21,7 +20,7 @@ public class CardViews : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoin
     private Vector2 dragOffset;
 
     private Vector3 basePosition;
-    private Quaternion baseRotation; 
+    private Vector3 baseRotation; 
     private int baseZIndex;
     private bool isDragging;
     private bool isSelected;
@@ -37,7 +36,8 @@ public class CardViews : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoin
     [SerializeField] private TextMeshProUGUI description;
     [SerializeField] private Image cardArt;
 
-    public CardData cardData { get; private set; }
+    public CardData cardData => _cardData;
+    private CardData _cardData;
 
     private void Awake()
     {
@@ -76,7 +76,7 @@ public class CardViews : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoin
         cardDescription = cardDescriptionRef;
     }
 
-    public void injection(CardData data, RectTransform dropZoneRef, HandView handViewRef, CardDescription cardDescriptionRef)
+    public void SetUp(CardData data, RectTransform dropZoneRef, HandView handViewRef, CardDescription cardDescriptionRef)
     {
         if (data == null) 
         {
@@ -89,7 +89,7 @@ public class CardViews : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoin
             return; 
         }
 
-        cardData = data;
+        _cardData = data;
         dropZone = dropZoneRef;
         SetHandView(handViewRef);
         SetCardDescriptionview(cardDescriptionRef);
@@ -112,7 +112,7 @@ public class CardViews : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoin
     public void SetBaseTargets(Vector3 targetPos, float targetRotZ, int zIndex) 
     {
         basePosition = targetPos;
-        baseRotation = Quaternion.Euler(0f, 0f, targetRotZ); 
+        baseRotation = new Vector3(0f, 0f, targetRotZ);
         baseZIndex = zIndex;
 
         if (!isDragging)
@@ -126,21 +126,10 @@ public class CardViews : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoin
         transform.DOKill(); 
         
         transform.DOLocalMove(basePosition, 0.25f).SetEase(Ease.OutCubic);
-        transform.DOLocalRotateQuaternion(baseRotation, 0.25f).SetEase(Ease.OutCubic);
+        transform.DOLocalRotate(baseRotation, 0.25f).SetEase(Ease.OutCubic);
         transform.DOScale(Vector3.one, 0.25f).SetEase(Ease.OutCubic);
         
         transform.SetSiblingIndex(baseZIndex);
-    }
-
-    private Camera ResolveEventCamera(PointerEventData eventData)
-    {
-        Camera eventCamera = eventData.pressEventCamera;
-        if (eventCamera == null && parentCanvas != null && parentCanvas.renderMode != RenderMode.ScreenSpaceOverlay)
-        {
-            eventCamera = parentCanvas.worldCamera;
-        }
-
-        return eventCamera;
     }
 
     private bool IsPointerOver(RectTransform targetRect, PointerEventData eventData)
@@ -150,7 +139,7 @@ public class CardViews : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoin
             return false;
         }
 
-        return RectTransformUtility.RectangleContainsScreenPoint(targetRect, eventData.position, ResolveEventCamera(eventData));
+        return RectTransformUtility.RectangleContainsScreenPoint(targetRect, eventData.position, null);
     }
 
     private void SetSelectedVisual(bool selected)
@@ -160,8 +149,8 @@ public class CardViews : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoin
 
         if (isSelected)
         {
-            transform.DOScale(Vector3.one * 1.5f, 0.15f).SetEase(Ease.OutBack);
-            transform.DOLocalRotateQuaternion(Quaternion.identity, 0.15f).SetEase(Ease.OutQuad);
+            transform.DOScale(new Vector3(1.5f, 1.5f, 1.5f), 0.15f).SetEase(Ease.OutBack);
+            transform.DOLocalRotate(Vector3.zero, 0.15f).SetEase(Ease.OutQuad);
             return;
         }
 
@@ -198,9 +187,8 @@ public class CardViews : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoin
 
         if (cardRect != null && parentRect != null)
         {
-            Camera eventCamera = ResolveEventCamera(eventData);
 
-            if (RectTransformUtility.ScreenPointToLocalPointInRectangle(parentRect, eventData.position, eventCamera, out Vector2 localPoint))
+            if (RectTransformUtility.ScreenPointToLocalPointInRectangle(parentRect, eventData.position, null, out Vector2 localPoint))
             {
                 dragOffset = cardRect.anchoredPosition - localPoint;
             }
@@ -238,12 +226,10 @@ public class CardViews : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoin
         {
             isDragging = true;
             transform.DOKill();
-            transform.DOScale(Vector3.one * 1.1f, 0.1f).SetEase(Ease.OutCubic);
+            transform.DOScale(new Vector3(1.1f, 1.1f, 1.1f), 0.1f).SetEase(Ease.OutCubic);
         }
 
-        Camera eventCamera = ResolveEventCamera(eventData);
-
-        if (RectTransformUtility.ScreenPointToLocalPointInRectangle(parentRect, eventData.position, eventCamera, out Vector2 localPoint))
+        if (RectTransformUtility.ScreenPointToLocalPointInRectangle(parentRect, eventData.position, null, out Vector2 localPoint))
         {
             cardRect.anchoredPosition = localPoint + dragOffset;
         }
@@ -272,7 +258,7 @@ public class CardViews : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoin
 
         if (cardData.cardType == CardData.CardType.Attack)
         {
-            Enemy target = handView.Enemies.FirstOrDefault(e =>
+            var target = handView.Enemies.FirstOrDefault(e =>
                 {
                     if (e == null || !e.gameObject.activeInHierarchy)
                     {

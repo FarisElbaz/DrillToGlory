@@ -4,7 +4,7 @@ using UnityEngine;
 public class DeckManager : MonoBehaviour
 {
     [Header("Cards in starting hand")]
-    [SerializeField] private List<CardData> startingHandCardData = new List<CardData>();
+    [SerializeField] private List<CardData> drawPile = new List<CardData>();
 
     [SerializeField] private List<CardData> discardCards = new List<CardData>();
 
@@ -21,9 +21,9 @@ public class DeckManager : MonoBehaviour
     private int maxHealCards = 3;
     private int minHealCards = 0;
 
-    public void initilizeDeck(){
+    public void InitilizeDeck(){
         int remainingCards = deckSize;
-        startingHandCardData = new List<CardData>();
+        drawPile = new List<CardData>();
         discardCards = new List<CardData>();
 
         int damageCardsToAdd = Random.Range(minDamagecards, maxDamagecards + 1);
@@ -68,18 +68,18 @@ public class DeckManager : MonoBehaviour
         {
             for(int i = 0; i < damageCardsToAdd; i++)
             {
-                startingHandCardData.Add(attackCardPrefab);
+                drawPile.Add(attackCardPrefab);
             }
         for(int i = 0; i < defenseCardsToAdd; i++)
             {
-                startingHandCardData.Add(defenseCardPrefab);
+                drawPile.Add(defenseCardPrefab);
             }
         for(int i = 0; i < healCardsToAdd; i++)
             {
-                startingHandCardData.Add(healCardPrefab);
+                drawPile.Add(healCardPrefab);
             }
 
-        CardRandomizer(startingHandCardData);
+        CardRandomizer(drawPile);
         }
             else
             {
@@ -89,13 +89,13 @@ public class DeckManager : MonoBehaviour
 
     public bool DrawCard(out CardData drawnData)
     {
-        if(startingHandCardData.Count == 0)
+        if(drawPile.Count == 0)
         {
             if(discardCards.Count > 0)
             {
                 Debug.Log("Reshuffling discard pile into deck");
-                startingHandCardData.AddRange(discardCards);
-                CardRandomizer(startingHandCardData);
+                drawPile.AddRange(discardCards);
+                CardRandomizer(drawPile);
                 discardCards.Clear();
             }
             else
@@ -106,8 +106,8 @@ public class DeckManager : MonoBehaviour
             }
         }
 
-        drawnData = startingHandCardData[0];
-        startingHandCardData.RemoveAt(0);
+        drawnData = drawPile[0];
+        drawPile.RemoveAt(0);
         return true;
     }
 
@@ -120,9 +120,9 @@ public class DeckManager : MonoBehaviour
     {
         if (cardsInHand.Count == 0)
         {
-            if (startingHandCardData.Count > 1)
+            if (drawPile.Count > 1)
             {
-                CardRandomizer(startingHandCardData);
+                CardRandomizer(drawPile);
             }
             return;
         }
@@ -131,13 +131,13 @@ public class DeckManager : MonoBehaviour
         {
             if (card != null && card.cardData != null)
             {
-                startingHandCardData.Add(card.cardData);
+                drawPile.Add(card.cardData);
             }
         }
 
-        if (startingHandCardData.Count > 1)
+        if (drawPile.Count > 1)
         {
-            CardRandomizer(startingHandCardData);
+            CardRandomizer(drawPile);
         }
     }
 

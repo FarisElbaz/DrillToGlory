@@ -18,23 +18,23 @@ public class Upgrades : MonoBehaviour
     private int baseUtility = 0;
     private float baseDefense = 0;
 
-    public int UpgradePoints { get => upgradePoints; set => upgradePoints = value; }
-    public int Baseregen { get => baseregen; set => baseregen = value; }
-    public float BaseDamage { get => baseDamage; set => baseDamage = value; }
-    public int BaseUtility { get => baseUtility; set => baseUtility = value; }
-    public float BaseDefense { get => baseDefense; set => baseDefense = value; }
+    public int UpgradePoints { get => upgradePoints; }
+    public int Baseregen { get => baseregen; }
+    public float BaseDamage { get => baseDamage; }
+    public int BaseUtility { get => baseUtility; }
+    public float BaseDefense { get => baseDefense; }
 
     [SerializeField] private Player player;
 
 
     public void ToggleUpgrades()
     {
-        if (upgradePanel.activeSelf)
+        if (upgradePanel.activeInHierarchy)
         {
             upgradePanel.SetActive(false);
             distortionEffect.SetActive(false);
         }
-        else if(upgradePanel.activeSelf == false)
+        else if(upgradePanel.activeInHierarchy == false)
         {
             upgradePanel.SetActive(true);
             distortionEffect.SetActive(true);
@@ -43,13 +43,15 @@ public class Upgrades : MonoBehaviour
         return;
     }
 
+    public void AddUpgradePoint()
+    {
+        upgradePoints += 1;
+        upgradesUI.updateUpgradesUI();
+    }
+
     public void UpgradeRegen()
     {
-        if(baseregen >= 15)
-        {
-            return;
-        }
-        if(upgradePoints <= 0)
+        if(baseregen >= 15 || upgradePoints <= 0)
         {
             return;
         }
@@ -83,11 +85,7 @@ public class Upgrades : MonoBehaviour
     }
 
     public void UpgradeDamage(){ // Same as defense, probably will increase a multiplier or something
-        if(baseDamage >= 10)
-        {
-            return;
-        }
-        if(upgradePoints <= 0)
+        if(baseDamage >= 10 || upgradePoints <= 0)
         {
             return;
         }
@@ -98,11 +96,7 @@ public class Upgrades : MonoBehaviour
 
     public void UpgradeUtility()
     { // Basically max mana
-        if(baseUtility >= 3)
-        {
-            return;
-        }
-        if(upgradePoints <= 0)
+        if(baseUtility >= 3 || upgradePoints <= 0)
         {
             return;
         }
@@ -117,11 +111,7 @@ public class Upgrades : MonoBehaviour
 
     public void UpgradeDefense() // still unsure how i want defense to impact gameplay
     {
-        if(baseDefense >= 10)
-        {
-            return;
-        }
-        if(upgradePoints <= 0)
+        if(baseDefense >= 10 || upgradePoints <= 0)
         {
             return;
         }
@@ -131,15 +121,5 @@ public class Upgrades : MonoBehaviour
     }
 
 
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+    
 }

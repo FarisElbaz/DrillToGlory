@@ -86,6 +86,7 @@
     <Compile Include="Assets/Firebase/FirebaseAI/Candidate.cs" />
     <Compile Include="Assets/TextMesh Pro/Examples &amp; Extras/Scripts/TMP_TextInfoDebugTool.cs" />
     <Compile Include="Assets/Firebase/FirebaseAI/LiveSession.cs" />
+    <Compile Include="Assets/_Scripts/Visuals/AuthManager.cs" />
     <Compile Include="Assets/TextMesh Pro/Examples &amp; Extras/Scripts/VertexShakeA.cs" />
     <Compile Include="Assets/TextMesh Pro/Examples &amp; Extras/Scripts/Benchmark01_UGUI.cs" />
     <Compile Include="Assets/TextMesh Pro/Examples &amp; Extras/Scripts/SimpleScript.cs" />
@@ -100,6 +101,7 @@
     <Compile Include="Assets/TextMesh Pro/Examples &amp; Extras/Scripts/TextMeshSpawner.cs" />
     <Compile Include="Assets/Firebase/FirebaseAI/Safety.cs" />
     <Compile Include="Assets/_Scripts/GameplayMechanics/Player.cs" />
+    <Compile Include="Assets/_Scripts/GameplayMechanics/EnemySpawner.cs" />
     <Compile Include="Assets/TextMesh Pro/Examples &amp; Extras/Scripts/CameraController.cs" />
     <Compile Include="Assets/TextMesh Pro/Examples &amp; Extras/Scripts/Benchmark03.cs" />
     <Compile Include="Assets/Firebase/FirebaseAI/FirebaseAI.cs" />
@@ -125,6 +127,7 @@
     <Compile Include="Assets/DOTween/Modules/DOTweenModuleSprite.cs" />
     <Compile Include="Assets/Firebase/FirebaseAI/Imagen/ImagenModel.cs" />
     <Compile Include="Assets/TextMesh Pro/Examples &amp; Extras/Scripts/TextMeshProFloatingText.cs" />
+    <Compile Include="Assets/_Scripts/Visuals/Firestoresaving.cs" />
     <Compile Include="Assets/Firebase/FirebaseAI/ResponseModality.cs" />
     <Compile Include="Assets/Firebase/FirebaseAI/Imagen/ImagenSafety.cs" />
     <Compile Include="Assets/_Scripts/GameplayMechanics/CardViews.cs" />

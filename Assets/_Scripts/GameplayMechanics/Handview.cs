@@ -1,7 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -18,6 +17,8 @@ public class HandView : MonoBehaviour
 
     [SerializeField] private DeckManager deckManager;
 
+    [SerializeField] private EnemySpawner enemyManager;
+
     [SerializeField] private RectTransform dropZone;
 
     [SerializeField] private CardViews cardPrefab;
@@ -25,10 +26,6 @@ public class HandView : MonoBehaviour
     [SerializeField] private CardDescription cardDescription;
 
     public enum GameState { PlayerTurn, EnemyTurn, Victory, Defeat}
-
-    public GameObject[] enemyPool;
-
-    public Transform enemyLocation;
 
     [SerializeField] private GameState currentState;
 
@@ -53,6 +50,16 @@ public class HandView : MonoBehaviour
 
     [SerializeField] private int currentMana = 0;
 
+    private string userID;
+
+    private AuthManager authManager;
+
+    private void Awake()
+    {
+        authManager = AuthManager.Instance;
+        userID = authManager.CurrentUserId;
+    }
+
     [Header("Dimension Damage Modifiers")]
     [SerializeField] private float realityDamageToPlayerMultiplier = 1f;
     [SerializeField] private float realityDamageToEnemyMultiplier = 1f;
@@ -74,97 +81,21 @@ public class HandView : MonoBehaviour
         }
     }
 
-    public void Spawner(int count)
-    {
-        if (enemyPool == null || enemyPool.Length == 0)
-        {
-            Debug.LogWarning("Enemy pool is empty. Spawner aborted.");
-            return;
-        }
-
-        count = Mathf.Max(1, count);
-
-        foreach (Enemy enemy in enemies)
-        {
-            if (enemy != null)
-            {
-                Destroy(enemy.gameObject);
-            }
-        }
-        enemies.Clear();
-
-        for (int i = 0; i < count; ++i)
-        {
-            GameObject prefab = enemyPool[Random.Range(0, enemyPool.Length)];
-            GameObject random_enemy = Instantiate(prefab, enemyLocation, false);
-            
-            Enemy enemyComponent = random_enemy.GetComponent<Enemy>();
-            if (enemyComponent == null)
-            {
-                Debug.LogWarning($"Spawned prefab '{prefab.name}' has no Enemy component.");
-                Destroy(random_enemy);
-                continue;
-            }
-
-            enemies.Add(enemyComponent);
-
-            enemyComponent.SetHand(this);
-            enemyComponent.SetupForRoom(roomCounter);
-
-            Debug.Log($"Spawned enemy from pool: {prefab.name}");
-        }
-
-        Debug.Log($"Spawner complete. Active enemies: {enemies.Count}");
-    }
-
-
-
     void Start()
     {
-        enemies.RemoveAll(enemy => enemy == null);
-        if (enemies.Count == 0)
-        {
-            Enemy[] foundEnemies = FindObjectsByType<Enemy>(FindObjectsSortMode.None);
-            enemies.AddRange(foundEnemies.Where(enemy => enemy != null));
-        }
+        authManager = AuthManager.Instance;
 
-        foreach (Enemy enemy in enemies)
-        {
-            enemy.SetHand(this);
-        }
-
-        if (playerstats == null)
-        {
-            playerstats = FindFirstObjectByType<Player>();
-        }
-
-        if (playerstats != null)
-        {
-            playerstats.SetHandView(this);
-        }
-
-        if (enemyPool != null && enemyPool.Length > 0)
+        if (enemyManager != null && enemyManager.CanSpawn)
         {
             int enemyCount = Mathf.Max(1, baseEnemiesPerRoom);
-            Spawner(enemyCount);
-        }
-        else
-        {
-            foreach (Enemy enemy in enemies)
-            {
-                if (enemy != null)
-                {
-                    enemy.SetHand(this);
-                    enemy.SetupForRoom(roomCounter);
-                }
-            }
+            enemyManager.Spawner(enemyCount, this, enemies, roomCounter, uiManager);
         }
 
         cardsInHand.Clear(); 
 
         SetGameState(GameState.PlayerTurn);
         currentMana = maxMana;
-        deckManager.initilizeDeck();
+        deckManager.InitilizeDeck();
 
         DrawUpToHandSize();
 
@@ -206,23 +137,17 @@ public class HandView : MonoBehaviour
     public void OnCardPlayed(CardViews playedCard, Enemy targetEnemy)
     {
         Debug.Log("OnCardPlayed called");
-        
-        if (currentState == GameState.Victory || currentState == GameState.Defeat)
+
+        if (currentState != GameState.PlayerTurn)
         {
-            Debug.Log("Game is already over, cannot play card");
+            Debug.Log("Not player turn, current state: " + currentState);
+            UpdateHandVisuals();
             return;
         }
 
         if (playedCard == null || playedCard.cardData == null)
         {
             Debug.LogWarning("Played card or card data is missing.");
-            return;
-        }
-
-        if (currentState != GameState.PlayerTurn)
-        {
-            Debug.Log("Not player turn, current state: " + currentState);
-            UpdateHandVisuals();
             return;
         }
 
@@ -280,15 +205,25 @@ public class HandView : MonoBehaviour
 
         if (currentDimension == Dimension.Reality)
         {
-            multiplier = target == DamageTarget.Player
-                ? realityDamageToPlayerMultiplier
-                : realityDamageToEnemyMultiplier;
+            if(target == DamageTarget.Player)
+            {
+                multiplier = realityDamageToPlayerMultiplier;
+            }
+            else
+            {
+                multiplier = realityDamageToEnemyMultiplier;
+            }
         }
         else if (currentDimension == Dimension.Void)
         {
-            multiplier = target == DamageTarget.Player
-                ? voidDamageToPlayerMultiplier
-                : voidDamageToEnemyMultiplier;
+            if(target == DamageTarget.Player)
+            {
+                multiplier = voidDamageToPlayerMultiplier;
+            }
+            else
+            {
+                multiplier = voidDamageToEnemyMultiplier;
+            }
         }
 
         int modifiedDamage = Mathf.Max(0, Mathf.RoundToInt(baseDamage * multiplier));
@@ -306,17 +241,13 @@ public class HandView : MonoBehaviour
 
     private bool DrawCard()
     {
-        if (currentState != GameState.PlayerTurn)
+        if (currentState != GameState.PlayerTurn || !deckManager.DrawCard(out CardData drawnData))
         {
             return false;
         }
 
-        if(!deckManager.DrawCard(out CardData drawnData))
-        {
-            return false;
-        }
         CardViews newCard = Instantiate(cardPrefab, transform);
-        newCard.injection(drawnData, dropZone, this, cardDescription);
+        newCard.SetUp(drawnData, dropZone, this, cardDescription);
         cardsInHand.Add(newCard);
         UpdateHandVisuals();
         if (uiManager != null)
@@ -433,7 +364,7 @@ public class HandView : MonoBehaviour
 
     private IEnumerator TransitionToPlayerTurnDelayed()
     {
-        yield return new WaitForSeconds(5f);
+        yield return new WaitForSeconds(3f);
         Debug.Log("Transitioning to Player Turn NOW");
         
         StartPlayerTurn();
@@ -472,7 +403,7 @@ public class HandView : MonoBehaviour
         if(upgrades != null)
         {
             upgrades.ApplyroomRegen();
-            upgrades.UpgradePoints += 1;
+            upgrades.AddUpgradePoint();
             if(upgrades.UpgradePoints > 0)
             {
                 upgrades.ToggleUpgrades();
@@ -501,7 +432,14 @@ public class HandView : MonoBehaviour
         UpdateHandVisuals();
 
         int enemyCount = Mathf.Max(1, baseEnemiesPerRoom + roomCounter);
-        Spawner(enemyCount);
+        if (enemyManager != null)
+        {
+            enemyManager.Spawner(enemyCount, this, enemies, roomCounter, uiManager);
+        }
+        else
+        {
+            Debug.LogWarning("EnemySpawner reference is missing. Cannot spawn room enemies.");
+        }
 
         DrawUpToHandSize();
         UpdateHandVisuals();
@@ -510,11 +448,6 @@ public class HandView : MonoBehaviour
     public void DimensionSwitchVisuals()
     {
         currentDimension = currentDimension == Dimension.Reality ? Dimension.Void : Dimension.Reality;
-
-        if (uiManager != null)
-        {
-            uiManager.DimensionSwitchVisuals(currentDimension);
-        }
     }
 
     public void ReturnToStart()

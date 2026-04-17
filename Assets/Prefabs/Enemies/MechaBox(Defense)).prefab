@@ -108,6 +108,10 @@ PrefabInstance:
       propertyPath: health
       value: 40
       objectReference: {fileID: 0}
+    - target: {fileID: 3906820555458479647, guid: 0efc44b1b1c9b4e91a5beaffadcaee29, type: 3}
+      propertyPath: enemytype
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 5544957317947098096, guid: 0efc44b1b1c9b4e91a5beaffadcaee29, type: 3}
       propertyPath: m_Name
       value: MechaBox(Defense))
