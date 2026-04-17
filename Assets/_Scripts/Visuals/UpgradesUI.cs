@@ -13,11 +13,11 @@ public class UpgradesUI : MonoBehaviour
 
     public void updateUpgradesUI()
     {
-        upgradePointsText.text = "Upgrade Points: " + upgrades.UpgradePoints;
-        regenText.text = "Regen: " + upgrades.Baseregen;
-        damageText.text = "Damage: " + upgrades.BaseDamage;
-        utilityText.text = "Utility: " + upgrades.BaseUtility;
-        defenseText.text = "Defense: " + upgrades.BaseDefense;
+        upgradePointsText.text = upgrades.UpgradePoints.ToString();
+        regenText.text = upgrades.Baseregen.ToString();
+        damageText.text = upgrades.BaseDamage.ToString();
+        utilityText.text = upgrades.BaseUtility.ToString();
+        defenseText.text = upgrades.BaseDefense.ToString();
     }
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created

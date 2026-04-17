@@ -2,9 +2,17 @@ using DG.Tweening;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
+using System.Threading.Tasks;
+using System.Linq;
 
 public class UiManager : MonoBehaviour
 {
+    [Header("Dimension VFX")]
+    [SerializeField] private Camera shakeCamera;
+    [SerializeField] private float dimensionShakeDuration = 0.35f;
+    [SerializeField] private float dimensionShakeStrength = 3f;
+
     [SerializeField] private Image backgroundUI;
     [SerializeField] private Color realityColor = Color.white;
     [SerializeField] private Color voidColor = new Color(0.5f, 0, 0.5f);
@@ -15,6 +23,20 @@ public class UiManager : MonoBehaviour
     [SerializeField] private GameObject victoryScreen;
     [SerializeField] private GameObject defeatScreen;
 
+    [SerializeField] private GameObject leaderboardPanel; 
+
+    [SerializeField] private TextMeshProUGUI firstPlace;
+    [SerializeField] private TextMeshProUGUI secondPlace;
+    [SerializeField] private TextMeshProUGUI thirdPlace;
+    [SerializeField] private TextMeshProUGUI currentPlayer;
+
+    [SerializeField] private TextMeshProUGUI recordedHighscore;
+    
+    [SerializeField] private Firestoresaving firestoreSaving;
+
+    [SerializeField] private TextMeshProUGUI victoryLevelText;
+    [SerializeField] private TextMeshProUGUI defeatLevelText;
+
     private HandView.GameState lastKnownState = HandView.GameState.PlayerTurn;
 
     public void InitializeUi(HandView.GameState currentState, int currentMana, int maxMana)
@@ -23,7 +45,29 @@ public class UiManager : MonoBehaviour
         UpdateManaDisplay(currentMana, maxMana);
     }
 
-    public void SetGameState(HandView.GameState currentState)
+    public void SetCurrentLevel(int currentLevel, HandView.GameState currentState)
+    {
+        string levelText = currentLevel.ToString();
+
+        if (currentState == HandView.GameState.Victory)
+        {
+            if (victoryLevelText != null)
+            {
+                victoryLevelText.text = levelText;
+            }
+            return;
+        }
+
+        if (currentState == HandView.GameState.Defeat)
+        {
+            if (defeatLevelText != null)
+            {
+                defeatLevelText.text = levelText;
+            }
+        }
+    }
+
+    public void SetGameState(HandView.GameState currentState, int currentRoom = 0)
     {
         lastKnownState = currentState;
 
@@ -46,6 +90,11 @@ public class UiManager : MonoBehaviour
         {
             defeatScreen.SetActive(currentState == HandView.GameState.Defeat);
         }
+
+        if (currentState == HandView.GameState.Victory || currentState == HandView.GameState.Defeat)
+        {
+            SetCurrentLevel(currentRoom, currentState);
+        }
     }
 
     public void UpdateManaDisplay(int currentMana, int maxMana)
@@ -66,7 +115,100 @@ public class UiManager : MonoBehaviour
             return;
         }
 
-        healthDisplay.text = $"Player Health: {currentHealth}";
+        healthDisplay.text = $"Health: {currentHealth}";
+    }
+
+    public void UpdateDefenseDisplay(TextMeshProUGUI defenseDisplay, int currentDefense)
+    {
+        if (defenseDisplay == null)
+        {
+            Debug.LogWarning("Defense display is not assigned.");
+            return;
+        }
+
+        defenseDisplay.text = $"Defense: {currentDefense}";
+    }
+
+    public async Task UpdateLeaderBoard()
+    {
+        if (firestoreSaving == null)
+        {
+            Debug.LogError("Firestoresaving is not assigned on UiManager!");
+            return;
+        }
+        // So i can test the game without logging in everytime.
+        AuthManager authManager = AuthManager.Instance;
+        if (authManager == null || authManager.User == null)
+        {
+            if (currentPlayer != null)
+            {
+                currentPlayer.text = "You (Offline Test)";
+            }
+
+            if (recordedHighscore != null)
+            {
+                recordedHighscore.text = "0";
+            }
+
+            if (firstPlace != null)
+            {
+                firstPlace.text = "Leaderboard requires login";
+            }
+
+            if (secondPlace != null)
+            {
+                secondPlace.text = "";
+            }
+
+            if (thirdPlace != null)
+            {
+                thirdPlace.text = "";
+            }
+
+            return;
+        }
+
+        await firestoreSaving.GetTop3();
+        var top3 = firestoreSaving.Top3Players;
+        
+        string currentUserId = authManager.CurrentUserId;
+        await firestoreSaving.GetCurrentHighest(currentUserId);
+        int currentUserScore = firestoreSaving.CurrentHighestRoom;
+        
+        Debug.Log($"Leaderboard updated - Top 3 count: {top3.Count}, Current user score: {currentUserScore}");
+        
+        string userName;
+        if (authManager.User.DisplayName != null)
+        {
+            userName = authManager.User.DisplayName;
+        }
+        else
+        {
+            userName = "Test Player";
+        }
+        if (currentPlayer != null)
+        {
+            currentPlayer.text = $"You ({userName}):";
+        }
+        if (recordedHighscore != null)
+        {
+            recordedHighscore.text = currentUserScore.ToString();
+        }
+        
+        // Display top 3
+        if (top3.Count == 0)
+        {
+            firstPlace.text = "No players yet!";
+            secondPlace.text = "";
+            thirdPlace.text = "";
+            return;
+        }
+        else
+        {
+            firstPlace.text = $"{top3.Keys.ElementAt(0)}: {top3.Values.ElementAt(0)}";
+            secondPlace.text = $"{top3.Keys.ElementAt(1)}: {top3.Values.ElementAt(1)}";
+            thirdPlace.text = $"{top3.Keys.ElementAt(2)}: {top3.Values.ElementAt(2)}";
+        }
     }
 
     public void UpdateEnemyHealthDisplay(TextMeshProUGUI healthDisplay, int currentHealth)
@@ -128,18 +270,75 @@ public class UiManager : MonoBehaviour
     {
         if (backgroundUI != null)
         {
-            backgroundUI.color = currentDimension == Dimension.Reality ? realityColor : voidColor;
+            if(currentDimension == Dimension.Reality)
+            {
+                backgroundUI.DOColor(realityColor, 1f);
+            }
+            else
+            {
+                backgroundUI.DOColor(voidColor, 1f);
+            }
         }
 
+        
         if (Camera.main != null)
         {
-            Camera.main.DOShakeRotation(0.5f, 10f);
-            Camera.main.DOShakePosition(0.5f, 10f);
+            Camera.main.transform.DOShakeRotation(dimensionShakeDuration, dimensionShakeStrength);
+            Camera.main.transform.DOShakePosition(dimensionShakeDuration, dimensionShakeStrength);
         }
+        else
+        {
+            Debug.LogWarning("No camera found for shake. Assign shakeCamera on UiManager or tag one camera as MainCamera.");
+        }
+    }
+
+    public void OpenLeaderboard()
+    {
+        if (leaderboardPanel != null)
+        {
+            leaderboardPanel.SetActive(true);
+            _= UpdateLeaderBoard();
+        }
+    }
+
+    public void CloseLeaderboard()
+    {
+        if (leaderboardPanel != null)
+        {
+            leaderboardPanel.SetActive(false);
+        }
+    }
+
+    public void PlayGame()
+    {
+        DOTween.KillAll();
+        BackgroundMusicPersistence.MuteMusic();
+        SceneManager.LoadScene(2);
+    }
+
+    public void ReturnToMainMenu()
+    {
+        DOTween.KillAll();
+        SceneManager.LoadScene(1);
+    }
+
+    public void Logout()
+    {
+        AuthManager.Instance.Auth.SignOut();
+        SceneManager.LoadScene(0);
     }
 
     private void Start()
     {
+        Application.targetFrameRate = 60;
+
         SetGameState(lastKnownState);
+
+        if (leaderboardPanel != null)
+        {
+            leaderboardPanel.SetActive(false);
+        }
     }
+
+
 }

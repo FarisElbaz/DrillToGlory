@@ -100,6 +100,10 @@ PrefabInstance:
       propertyPath: m_Sprite
       value: 
       objectReference: {fileID: 21300000, guid: d49e1f2e7e8a04685891a6dbd413ec3f, type: 3}
+    - target: {fileID: 3906820555458479647, guid: 0efc44b1b1c9b4e91a5beaffadcaee29, type: 3}
+      propertyPath: enemytype
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: 5544957317947098096, guid: 0efc44b1b1c9b4e91a5beaffadcaee29, type: 3}
       propertyPath: m_Name
       value: MechaSpider(Health)

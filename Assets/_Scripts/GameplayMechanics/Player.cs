@@ -5,6 +5,7 @@ public class Player : MonoBehaviour
 {
     [SerializeField] private int playerHealth = 30;
     [SerializeField] private int defense = 0;
+    [SerializeField] private Animator animator;
     
     public int Defense { get => defense; set => defense = value; }
 
@@ -14,6 +15,7 @@ public class Player : MonoBehaviour
     [SerializeField] private UiManager uiManager;
 
     [SerializeField] private TextMeshProUGUI healthDisplay;
+    [SerializeField] private TextMeshProUGUI defenseDisplay;
 
     [SerializeField] private Upgrades upgrades;
 
@@ -33,6 +35,23 @@ public class Player : MonoBehaviour
         int effectiveDamage = Mathf.Max(damage - (int)totalDefense, 0);  
         CurrentPlayerHealth -= effectiveDamage;
         Debug.Log("Player health is now: " + CurrentPlayerHealth);
+
+        if (animator != null)
+        {
+            if(totalDefense >= damage)
+            {
+                animator.SetTrigger("IsDefend");
+
+            }
+            else
+            {
+                animator.SetTrigger("IsHit");
+            }
+        }
+        else
+        {
+            Debug.LogWarning("Player Animator reference is missing.");
+        }
         
         UpdateHealthDisplay();
         
@@ -68,6 +87,7 @@ public class Player : MonoBehaviour
     public void defend(int defenseAmount)
     {
         defense += defenseAmount;
+        UpdateDefenseDisplay();
     }
 
     public void UpdateHealthDisplay()
@@ -84,11 +104,26 @@ public class Player : MonoBehaviour
         uiManager.UpdatePlayerHealthDisplay(healthDisplay, CurrentPlayerHealth);
     }
 
+    public void UpdateDefenseDisplay()
+    {
+        if (uiManager == null)
+        {
+            if (defenseDisplay != null)
+            {
+                defenseDisplay.text = $"Defense: {defense}";
+            }
+            return;
+        }
+
+        uiManager.UpdateDefenseDisplay(defenseDisplay, defense);
+    }
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
         CurrentPlayerHealth = playerHealth;
         UpdateHealthDisplay();
+        UpdateDefenseDisplay();
     }
 
 }

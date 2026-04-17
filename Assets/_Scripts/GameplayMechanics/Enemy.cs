@@ -14,23 +14,28 @@ public class Enemy : MonoBehaviour
 
     [SerializeField] private TextMeshProUGUI healthDisplay;
 
-    EnemyType enemytype;
-
-     public enum EnemyType
+    [SerializeField] EnemyType enemytype;
+    public enum EnemyType
     {
         Aggro,
         Tank,
         Healer
     }
 
-    public void SetHand(HandView handView)
+    private void Awake()
+    {
+        CurrentHealth = health;
+    }
+
+    public void SetHand(HandView handView, UiManager uiManager)
     {
         hand = handView;
+        this.uiManager = uiManager;
     }
 
     public void SetupForRoom(int roomCounter)
     {
-        CurrentHealth = 20 + (roomCounter * 5);
+        CurrentHealth = health + (roomCounter * 5);
 
         if (uiManager != null)
         {
@@ -64,31 +69,12 @@ public class Enemy : MonoBehaviour
         }
     }
 
-    public void TakeTurn(Player player)
-    {
-        switch (enemytype)
-        {
-            case EnemyType.Aggro:
-                if (player != null && hand != null)
-                {
-                    player.DamageTaken(10);
-                }
-                break;
-            case EnemyType.Tank:
-                CurrentHealth += 20;
-                break;
-            case EnemyType.Healer:
-                healAlly();
-                break;
-        }
-
-    }
-
     void healAlly()
     {
         var target = hand.Enemies.OrderBy(e => e.CurrentHealth).FirstOrDefault();
 
         if(target != null) target.CurrentHealth += 5;
+        uiManager.UpdateEnemyHealthDisplay(healthDisplay, target.CurrentHealth);
 
     }
 
@@ -108,22 +94,17 @@ public class Enemy : MonoBehaviour
             return;
         }
 
-        var modifiedDamage = 10;
-        player.DamageTaken(modifiedDamage);
-    }
-
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
-    {
-        CurrentHealth = health;
-
-        if (uiManager != null)
+        switch (enemytype)
         {
-            uiManager.UpdateEnemyHealthDisplay(healthDisplay, CurrentHealth);
-        }
-        else if (healthDisplay != null)
-        {
-            healthDisplay.text = $"Enemy Health: {CurrentHealth}";
+            case EnemyType.Aggro:
+                player.DamageTaken(10);
+                break;
+            case EnemyType.Tank:
+                player.DamageTaken(5);
+                break;
+            case EnemyType.Healer:
+                healAlly();
+                break;
         }
     }
 
