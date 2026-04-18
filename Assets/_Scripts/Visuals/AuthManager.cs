@@ -33,6 +33,12 @@ public class AuthManager : MonoBehaviour
         User = Auth.CurrentUser;
     }
 
+    public void SignOut()
+    {
+        Auth?.SignOut();
+        User = null;
+    }
+
     public IEnumerator Login(string email, string password, Action<FirebaseUser> onSuccess, Action<string> onError)
     {
         var loginTask = Auth.SignInWithEmailAndPasswordAsync(email, password);
