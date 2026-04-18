@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 469c24fdb3bd6431b92cc1465bd9166b, type: 3}
+  m_Name: RemoteConfigDataStoreAsset
+  m_EditorClassIdentifier: Unity.RemoteConfig.Editor::Unity.RemoteConfig.Editor.RemoteConfigDataStore
+  _rsKeyList: "[\n  {\n    \"metadata\": {\n      \"entityId\": \"1416bada-4708-4743-b091-f44f5cf71bc2\"\n   
+    },\n    \"rs\": {\n      \"key\": \"manaCost\",\n      \"value\": 5,\n      \"type\":
+    \"int\"\n    }\n  }\n]"
+  _rsLastCachedKeyList: '[]'
+  _environments: "[\n  {\n    \"projectId\": \"deb364b7-80dc-48a4-8085-c4ebfaaee0b0\",\n   
+    \"name\": \"production\",\n    \"id\": \"f5a579f2-f3ae-446f-aa1d-d3c07fb87cf5\",\n   
+    \"isDefault\": true,\n    \"createdAt\": \"2026-02-19T07:42:23Z\",\n    \"updatedAt\":
+    \"2026-02-19T07:42:23Z\"\n  }\n]"
