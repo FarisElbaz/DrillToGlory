@@ -324,7 +324,7 @@ public class UiManager : MonoBehaviour
 
     public void Logout()
     {
-        AuthManager.Instance.Auth.SignOut();
+        AuthManager.Instance.SignOut();
         SceneManager.LoadScene(0);
     }
 
